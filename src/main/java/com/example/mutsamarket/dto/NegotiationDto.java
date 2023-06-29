@@ -21,7 +21,7 @@ public class NegotiationDto {
     @NotBlank
     private String password;
 
-    public NegotiationDto fromEntity(Negotiation negotiation) {
+    public static NegotiationDto fromEntity(Negotiation negotiation) {
         NegotiationDto dto = new NegotiationDto();
         dto.setItemId(negotiation.getItemId());
         dto.setSuggestedPrice(negotiation.getSuggestedPrice());

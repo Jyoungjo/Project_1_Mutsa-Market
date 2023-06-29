@@ -28,7 +28,7 @@ public class SalesItemDto {
     @NotBlank
     private String password;
 
-    public SalesItemDto fromEntity(SalesItem salesItem) {
+    public static SalesItemDto fromEntity(SalesItem salesItem) {
         SalesItemDto dto = new SalesItemDto();
         dto.setTitle(salesItem.getTitle());
         dto.setDescription(salesItem.getDescription());

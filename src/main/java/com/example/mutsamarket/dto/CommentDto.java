@@ -22,7 +22,7 @@ public class CommentDto {
     @NotBlank
     private String reply;
 
-    public CommentDto fromEntity(Comment comment) {
+    public static CommentDto fromEntity(Comment comment) {
         CommentDto dto = new CommentDto();
         dto.setItemId(comment.getItemId());
         dto.setWriter(comment.getWriter());
