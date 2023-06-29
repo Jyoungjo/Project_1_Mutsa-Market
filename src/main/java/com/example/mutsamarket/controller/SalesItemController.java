@@ -1,7 +1,6 @@
 package com.example.mutsamarket.controller;
 
-import com.example.mutsamarket.dto.ResponseDto;
-import com.example.mutsamarket.dto.SalesItemDto;
+import com.example.mutsamarket.dto.item.*;
 import com.example.mutsamarket.service.SalesItemService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,12 +16,12 @@ public class SalesItemController {
     private final SalesItemService itemService;
 
     @PostMapping
-    public ResponseDto create(@RequestBody SalesItemDto dto) {
+    public ResponseDto create(@RequestBody ItemDto dto) {
         return itemService.addItem(dto);
     }
 
     @GetMapping
-    public Page<SalesItemDto> readAll(
+    public Page<ResponsePageDto> readAll(
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "limit", defaultValue = "20") Integer limit
     ) {
@@ -30,7 +29,7 @@ public class SalesItemController {
     }
 
     @GetMapping("/{itemId}")
-    public SalesItemDto readOne(
+    public ResponseItemDto readOne(
             @PathVariable("itemId") Long itemId
     ) {
         return itemService.readOneItem(itemId);
@@ -38,7 +37,7 @@ public class SalesItemController {
 
     @PutMapping("/{itemId}")
     public ResponseDto update(
-            @PathVariable("itemId") Long itemId, @RequestBody SalesItemDto dto
+            @PathVariable("itemId") Long itemId, @RequestBody ItemDto dto
     ) {
         return itemService.updateItemInfo(itemId, dto);
     }
@@ -52,7 +51,7 @@ public class SalesItemController {
 
     @DeleteMapping("/{itemId}")
     public ResponseDto delete(
-            @PathVariable("itemId") Long itemId, @RequestBody SalesItemDto dto
+            @PathVariable("itemId") Long itemId, @RequestBody ItemDto dto
     ) {
         return itemService.deleteItem(itemId, dto);
     }

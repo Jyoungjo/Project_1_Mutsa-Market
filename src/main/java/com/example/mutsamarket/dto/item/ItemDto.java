@@ -1,4 +1,4 @@
-package com.example.mutsamarket.dto;
+package com.example.mutsamarket.dto.item;
 
 import com.example.mutsamarket.Entity.SalesItem;
 import jakarta.persistence.Column;
@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class SalesItemDto {
+public class ItemDto {
     @NotBlank
     private String title;
 
@@ -28,8 +28,8 @@ public class SalesItemDto {
     @NotBlank
     private String password;
 
-    public static SalesItemDto fromEntity(SalesItem salesItem) {
-        SalesItemDto dto = new SalesItemDto();
+    public static ItemDto fromEntity(SalesItem salesItem) {
+        ItemDto dto = new ItemDto();
         dto.setTitle(salesItem.getTitle());
         dto.setDescription(salesItem.getDescription());
         dto.setImageUrl(salesItem.getImageUrl());

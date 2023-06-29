@@ -1,7 +1,7 @@
 package com.example.mutsamarket.service;
 
 import com.example.mutsamarket.Entity.SalesItem;
-import com.example.mutsamarket.dto.SalesItemDto;
+import com.example.mutsamarket.dto.item.*;
 import com.example.mutsamarket.repository.SalesItemRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,8 +17,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -28,7 +26,7 @@ public class SalesItemService {
     private final SalesItemRepository itemRepository;
 
     // 물품 등록
-    public SalesItemDto addItem(SalesItemDto dto) {
+    public ResponseDto addItem(ItemDto dto) {
         SalesItem newItem = new SalesItem();
         newItem.setTitle(dto.getTitle());
         newItem.setDescription(dto.getDescription());
@@ -36,30 +34,30 @@ public class SalesItemService {
         newItem.setStatus("판매중");
         newItem.setWriter(dto.getWriter());
         newItem.setPassword(dto.getPassword());
-
-        return SalesItemDto.fromEntity(itemRepository.save(newItem));
+        ItemDto.fromEntity(itemRepository.save(newItem));
+        return new ResponseDto("등록이 완료되었습니다.");
     }
 
     // 물품 전체 조회 (페이지 단위)
-    public Page<SalesItemDto> readAllItems(Integer pageNum, Integer pageSize) {
-        Pageable pageable = PageRequest.of(pageNum, pageSize, Sort.by("itemId"));
+    public Page<ResponsePageDto> readAllItems(Integer pageNum, Integer pageSize) {
+        Pageable pageable = PageRequest.of(pageNum, pageSize, Sort.by("id"));
         Page<SalesItem> itemEntityPage = itemRepository.findAll(pageable);
 
-        return itemEntityPage.map(SalesItemDto::fromEntity);
+        return itemEntityPage.map(ResponsePageDto::fromEntity);
     }
 
     // 물품 단일 조회
-    public SalesItemDto readOneItem(Long itemId) {
+    public ResponseItemDto readOneItem(Long itemId) {
         Optional<SalesItem> optionalSalesItem = itemRepository.findById(itemId);
         if (optionalSalesItem.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
 
-        return SalesItemDto.fromEntity(optionalSalesItem.get());
+        return ResponseItemDto.fromEntity(optionalSalesItem.get());
     }
 
     // 등록 물품 정보 수정
-    public SalesItemDto updateItemInfo(Long itemId, SalesItemDto dto) {
+    public ResponseDto updateItemInfo(Long itemId, ItemDto dto) {
         Optional<SalesItem> optionalSalesItem = itemRepository.findById(itemId);
         if (optionalSalesItem.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
@@ -72,20 +70,21 @@ public class SalesItemService {
             salesItem.setMinPriceWanted(dto.getMinPriceWanted());
             salesItem.setWriter(dto.getWriter());
             salesItem.setPassword(dto.getPassword());
-            return SalesItemDto.fromEntity(itemRepository.save(salesItem));
+            ItemDto.fromEntity(itemRepository.save(salesItem));
+            return new ResponseDto("물품이 수정되었습니다.");
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_IMPLEMENTED);
         }
     }
 
     // 등록 물품 이미지 첨부
-    public SalesItemDto updateItemImage(Long itemId, MultipartFile itemImage) {
+    public ResponseDto updateItemImage(Long itemId, MultipartFile itemImage) {
         Optional<SalesItem> optionalSalesItem = itemRepository.findById(itemId);
         if (optionalSalesItem.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
 
-        String itemImagesDir = String.format("itemImages/%d", itemId);
+        String itemImagesDir = String.format("itemImages/%d/", itemId);
         try {
             Files.createDirectories(Path.of(itemImagesDir));
         } catch (IOException e) {
@@ -108,20 +107,23 @@ public class SalesItemService {
 
         SalesItem salesItem = optionalSalesItem.get();
         salesItem.setImageUrl(String.format("/static/%d/%s", itemId, itemFilename));
-        return SalesItemDto.fromEntity(itemRepository.save(salesItem));
+        itemRepository.save(salesItem);
+        return new ResponseDto("이미지가 등록되었습니다.");
     }
 
     // 등록 물품 삭제
-    public void deleteItem(Long itemId, SalesItemDto dto) {
+    public ResponseDto deleteItem(Long itemId, ItemDto dto) {
         Optional<SalesItem> optionalSalesItem = itemRepository.findById(itemId);
         if (optionalSalesItem.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
         SalesItem salesItem = optionalSalesItem.get();
-        if (dto.getPassword().equals(salesItem.getPassword())) {
-            itemRepository.deleteById(itemId);
-        } else {
+        if (!dto.getPassword().equals(salesItem.getPassword()) || !dto.getWriter().equals(salesItem.getWriter())) {
             throw new ResponseStatusException(HttpStatus.NOT_IMPLEMENTED);
         }
+
+        itemRepository.deleteById(itemId);
+
+        return new ResponseDto("물품을 삭제했습니다.");
     }
 }
