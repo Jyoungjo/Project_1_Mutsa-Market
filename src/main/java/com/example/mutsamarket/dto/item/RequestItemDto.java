@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class ItemDto {
+public class RequestItemDto {
     @NotBlank
     private String title;
 
@@ -16,7 +16,6 @@ public class ItemDto {
 
     private String imageUrl;
 
-    @NotBlank
     private Integer minPriceWanted;
 
     private String status;
@@ -28,8 +27,8 @@ public class ItemDto {
     @NotBlank
     private String password;
 
-    public static ItemDto fromEntity(SalesItem salesItem) {
-        ItemDto dto = new ItemDto();
+    public static RequestItemDto fromEntity(SalesItem salesItem) {
+        RequestItemDto dto = new RequestItemDto();
         dto.setTitle(salesItem.getTitle());
         dto.setDescription(salesItem.getDescription());
         dto.setImageUrl(salesItem.getImageUrl());

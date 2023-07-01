@@ -2,6 +2,9 @@ package com.example.mutsamarket.service;
 
 import com.example.mutsamarket.Entity.SalesItem;
 import com.example.mutsamarket.dto.item.*;
+import com.example.mutsamarket.exceptions.NotFoundItemException;
+import com.example.mutsamarket.exceptions.NotMatchPasswordException;
+import com.example.mutsamarket.exceptions.NotMatchWriterException;
 import com.example.mutsamarket.repository.SalesItemRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +29,7 @@ public class SalesItemService {
     private final SalesItemRepository itemRepository;
 
     // 물품 등록
-    public ResponseDto addItem(ItemDto dto) {
+    public ResponseDto addItem(RequestItemDto dto) {
         SalesItem newItem = new SalesItem();
         newItem.setTitle(dto.getTitle());
         newItem.setDescription(dto.getDescription());
@@ -34,54 +37,63 @@ public class SalesItemService {
         newItem.setStatus("판매중");
         newItem.setWriter(dto.getWriter());
         newItem.setPassword(dto.getPassword());
-        ItemDto.fromEntity(itemRepository.save(newItem));
+        RequestItemDto.fromEntity(itemRepository.save(newItem));
         return new ResponseDto("등록이 완료되었습니다.");
     }
 
     // 물품 전체 조회 (페이지 단위)
-    public Page<ResponsePageDto> readAllItems(Integer pageNum, Integer pageSize) {
+    public Page<ResponseItemsDto> readAllItems(Integer pageNum, Integer pageSize) {
         Pageable pageable = PageRequest.of(pageNum, pageSize, Sort.by("id"));
         Page<SalesItem> itemEntityPage = itemRepository.findAll(pageable);
 
-        return itemEntityPage.map(ResponsePageDto::fromEntity);
+        return itemEntityPage.map(ResponseItemsDto::fromEntity);
     }
 
     // 물품 단일 조회
     public ResponseItemDto readOneItem(Long itemId) {
         Optional<SalesItem> optionalSalesItem = itemRepository.findById(itemId);
         if (optionalSalesItem.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new NotFoundItemException();
         }
 
         return ResponseItemDto.fromEntity(optionalSalesItem.get());
     }
 
     // 등록 물품 정보 수정
-    public ResponseDto updateItemInfo(Long itemId, ItemDto dto) {
+    public ResponseDto updateItemInfo(Long itemId, RequestItemDto dto) {
         Optional<SalesItem> optionalSalesItem = itemRepository.findById(itemId);
         if (optionalSalesItem.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new NotFoundItemException();
         }
         SalesItem salesItem = optionalSalesItem.get();
 
-        if (dto.getPassword().equals(salesItem.getPassword())) {
-            salesItem.setTitle(dto.getTitle());
-            salesItem.setDescription(dto.getDescription());
-            salesItem.setMinPriceWanted(dto.getMinPriceWanted());
-            salesItem.setWriter(dto.getWriter());
-            salesItem.setPassword(dto.getPassword());
-            ItemDto.fromEntity(itemRepository.save(salesItem));
-            return new ResponseDto("물품이 수정되었습니다.");
-        } else {
-            throw new ResponseStatusException(HttpStatus.NOT_IMPLEMENTED);
+        if (!dto.getPassword().equals(salesItem.getPassword())) {
+            throw new NotMatchPasswordException();
         }
+
+        salesItem.setTitle(dto.getTitle());
+        salesItem.setDescription(dto.getDescription());
+        salesItem.setMinPriceWanted(dto.getMinPriceWanted());
+        salesItem.setWriter(dto.getWriter());
+        salesItem.setPassword(dto.getPassword());
+        RequestItemDto.fromEntity(itemRepository.save(salesItem));
+        return new ResponseDto("물품이 수정되었습니다.");
     }
 
     // 등록 물품 이미지 첨부
-    public ResponseDto updateItemImage(Long itemId, MultipartFile itemImage) {
+    public ResponseDto updateItemImage(Long itemId, MultipartFile itemImage, String writer, String password) {
         Optional<SalesItem> optionalSalesItem = itemRepository.findById(itemId);
         if (optionalSalesItem.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new NotFoundItemException();
+        }
+
+        SalesItem salesItem = optionalSalesItem.get();
+        if (!writer.equals(salesItem.getWriter())) {
+            throw new NotMatchWriterException();
+        }
+
+        if (!password.equals(salesItem.getPassword())) {
+            throw new NotMatchPasswordException();
         }
 
         String itemImagesDir = String.format("itemImages/%d/", itemId);
@@ -95,7 +107,7 @@ public class SalesItemService {
         String originalFilename = itemImage.getOriginalFilename();
         String[] fileNameSplit = originalFilename.split("\\.");
         String extension = fileNameSplit[fileNameSplit.length - 1];
-        String itemFilename = "itemImage." + extension;
+        String itemFilename = "itemImage_" + itemId + "." + extension;
         String itemImagePath = itemImagesDir + itemFilename;
 
         try {
@@ -105,21 +117,26 @@ public class SalesItemService {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        SalesItem salesItem = optionalSalesItem.get();
         salesItem.setImageUrl(String.format("/static/%d/%s", itemId, itemFilename));
         itemRepository.save(salesItem);
         return new ResponseDto("이미지가 등록되었습니다.");
     }
 
     // 등록 물품 삭제
-    public ResponseDto deleteItem(Long itemId, ItemDto dto) {
+    public ResponseDto deleteItem(Long itemId, RequestUserDto dto) {
         Optional<SalesItem> optionalSalesItem = itemRepository.findById(itemId);
         if (optionalSalesItem.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new NotFoundItemException();
         }
+
         SalesItem salesItem = optionalSalesItem.get();
-        if (!dto.getPassword().equals(salesItem.getPassword()) || !dto.getWriter().equals(salesItem.getWriter())) {
-            throw new ResponseStatusException(HttpStatus.NOT_IMPLEMENTED);
+
+        if (!dto.getWriter().equals(salesItem.getWriter())) {
+            throw new NotMatchWriterException();
+        }
+
+        if (!dto.getPassword().equals(salesItem.getPassword())) {
+            throw new NotMatchPasswordException();
         }
 
         itemRepository.deleteById(itemId);
