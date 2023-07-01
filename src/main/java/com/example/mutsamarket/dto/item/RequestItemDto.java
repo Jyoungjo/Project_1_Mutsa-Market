@@ -1,9 +1,8 @@
 package com.example.mutsamarket.dto.item;
 
-import com.example.mutsamarket.Entity.SalesItem;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
 @Data
@@ -11,7 +10,7 @@ public class RequestItemDto {
     @NotBlank
     private String title;
 
-    @NotNull
+    @NotEmpty
     private String description;
 
     private String imageUrl;
@@ -26,15 +25,4 @@ public class RequestItemDto {
 
     @NotBlank
     private String password;
-
-    public static RequestItemDto fromEntity(SalesItem salesItem) {
-        RequestItemDto dto = new RequestItemDto();
-        dto.setTitle(salesItem.getTitle());
-        dto.setDescription(salesItem.getDescription());
-        dto.setImageUrl(salesItem.getImageUrl());
-        dto.setMinPriceWanted(salesItem.getMinPriceWanted());
-        dto.setWriter(salesItem.getWriter());
-        dto.setPassword(salesItem.getPassword());
-        return dto;
-    }
 }

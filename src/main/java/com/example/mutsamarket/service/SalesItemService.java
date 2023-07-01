@@ -37,7 +37,7 @@ public class SalesItemService {
         newItem.setStatus("판매중");
         newItem.setWriter(dto.getWriter());
         newItem.setPassword(dto.getPassword());
-        RequestItemDto.fromEntity(itemRepository.save(newItem));
+        itemRepository.save(newItem);
         return new ResponseDto("등록이 완료되었습니다.");
     }
 
@@ -76,7 +76,7 @@ public class SalesItemService {
         salesItem.setMinPriceWanted(dto.getMinPriceWanted());
         salesItem.setWriter(dto.getWriter());
         salesItem.setPassword(dto.getPassword());
-        RequestItemDto.fromEntity(itemRepository.save(salesItem));
+        itemRepository.save(salesItem);
         return new ResponseDto("물품이 수정되었습니다.");
     }
 
