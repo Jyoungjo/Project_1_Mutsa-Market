@@ -10,6 +10,15 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 @RestControllerAdvice
 public class ExceptionController {
+    @ExceptionHandler(Status400Exception.class)
+    public ResponseEntity<ResponseDto> handleBadRequest(
+            Status400Exception exception
+    ) {
+        ResponseDto response = new ResponseDto();
+        response.setMessage(exception.getMessage());
+        return ResponseEntity.badRequest().body(response);
+    }
+
     @ExceptionHandler(Status403Exception.class)
     public ResponseEntity<ResponseDto> handleForbidden(
             Status403Exception exception

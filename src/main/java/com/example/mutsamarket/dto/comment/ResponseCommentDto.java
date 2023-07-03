@@ -11,6 +11,7 @@ public class ResponseCommentDto {
 
     public static ResponseCommentDto fromEntity(Comment comment) {
         ResponseCommentDto dto = new ResponseCommentDto();
+        dto.setId(comment.getId());
         dto.setContent(comment.getContent());
         dto.setReply(comment.getReply());
         return dto;
