@@ -25,7 +25,7 @@ public class SalesItemController {
     @GetMapping
     public Page<ResponseItemsDto> readAll(
             @RequestParam(value = "page", defaultValue = "0") Integer page,
-            @RequestParam(value = "limit", defaultValue = "20") Integer limit
+            @RequestParam(value = "limit", defaultValue = "25") Integer limit
     ) {
         return itemService.readAllItems(page, limit);
     }
