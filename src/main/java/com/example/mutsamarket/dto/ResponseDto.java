@@ -1,4 +1,4 @@
-package com.example.mutsamarket.dto.item;
+package com.example.mutsamarket.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
