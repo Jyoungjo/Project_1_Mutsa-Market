@@ -1,4 +1,4 @@
-package com.example.mutsamarket.dto;
+package com.example.mutsamarket.dto.nego;
 
 import com.example.mutsamarket.Entity.Negotiation;
 import jakarta.persistence.Column;
@@ -6,10 +6,9 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-public class NegotiationDto {
+public class RequestNegotiationDto {
     private Long itemId;
 
-    @NotBlank
     private Integer suggestedPrice;
 
     private String status;
@@ -21,8 +20,8 @@ public class NegotiationDto {
     @NotBlank
     private String password;
 
-    public static NegotiationDto fromEntity(Negotiation negotiation) {
-        NegotiationDto dto = new NegotiationDto();
+    public static RequestNegotiationDto fromEntity(Negotiation negotiation) {
+        RequestNegotiationDto dto = new RequestNegotiationDto();
         dto.setItemId(negotiation.getItemId());
         dto.setSuggestedPrice(negotiation.getSuggestedPrice());
         dto.setStatus(negotiation.getStatus());
