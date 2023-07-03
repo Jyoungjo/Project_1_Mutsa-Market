@@ -19,7 +19,6 @@ public class RequestItemDto {
 
     private String status;
 
-    @Column(unique = true)
     @NotBlank
     private String writer;
 

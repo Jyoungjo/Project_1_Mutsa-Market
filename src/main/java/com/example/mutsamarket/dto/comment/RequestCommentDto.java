@@ -9,7 +9,6 @@ import lombok.Data;
 public class RequestCommentDto {
     private Long itemId;
 
-    @Column(unique = true)
     @NotBlank
     private String writer;
 

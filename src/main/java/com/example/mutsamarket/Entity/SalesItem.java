@@ -12,11 +12,19 @@ public class SalesItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String title;
+
     private String description;
+
     private String imageUrl;
+
     private Integer minPriceWanted;
+
     private String status;
+
+    @Column(unique = true)
     private String writer;
+
     private String password;
 }

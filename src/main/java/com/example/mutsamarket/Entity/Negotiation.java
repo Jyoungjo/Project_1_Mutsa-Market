@@ -12,9 +12,15 @@ public class Negotiation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private Long itemId;
+
     private Integer suggestedPrice;
+
     private String status;
+
+    @Column(unique = true)
     private String writer;
+
     private String password;
 }

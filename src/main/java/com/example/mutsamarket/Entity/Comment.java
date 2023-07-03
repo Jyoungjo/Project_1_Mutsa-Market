@@ -12,9 +12,15 @@ public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private Long itemId;
+
+    @Column(unique = true)
     private String writer;
+
     private String password;
+
     private String content;
+
     private String reply;
 }

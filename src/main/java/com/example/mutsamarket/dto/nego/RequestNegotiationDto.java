@@ -13,7 +13,6 @@ public class RequestNegotiationDto {
 
     private String status;
 
-    @Column(unique = true)
     @NotBlank
     private String writer;
 
