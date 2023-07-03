@@ -1,4 +1,4 @@
-package com.example.mutsamarket.dto;
+package com.example.mutsamarket.dto.comment;
 
 import com.example.mutsamarket.Entity.Comment;
 import jakarta.persistence.Column;
@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-public class CommentDto {
+public class RequestCommentDto {
     private Long itemId;
 
     @Column(unique = true)
@@ -22,8 +22,8 @@ public class CommentDto {
     @NotBlank
     private String reply;
 
-    public static CommentDto fromEntity(Comment comment) {
-        CommentDto dto = new CommentDto();
+    public static RequestCommentDto fromEntity(Comment comment) {
+        RequestCommentDto dto = new RequestCommentDto();
         dto.setItemId(comment.getItemId());
         dto.setWriter(comment.getWriter());
         dto.setPassword(comment.getPassword());
