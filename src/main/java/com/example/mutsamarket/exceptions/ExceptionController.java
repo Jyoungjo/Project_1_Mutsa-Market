@@ -19,15 +19,6 @@ public class ExceptionController {
         return ResponseEntity.badRequest().body(response);
     }
 
-    @ExceptionHandler(Status403Exception.class)
-    public ResponseEntity<ResponseDto> handleForbidden(
-            Status403Exception exception
-    ) {
-        ResponseDto response = new ResponseDto();
-        response.setMessage(exception.getMessage());
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
-    }
-
     @ExceptionHandler(Status404Exception.class)
     public ResponseEntity<ResponseDto> handleNotFound(
             Status404Exception exception
