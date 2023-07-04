@@ -1,6 +1,5 @@
 package com.example.mutsamarket.salesitem;
 
-import com.example.mutsamarket.dto.item.*;
 import com.example.mutsamarket.exceptions.notfound.NotFoundItemException;
 import com.example.mutsamarket.salesitem.entity.SalesItem;
 import com.example.mutsamarket.salesitem.dto.RequestItemDto;

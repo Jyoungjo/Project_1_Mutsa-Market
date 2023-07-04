@@ -1,7 +1,6 @@
 package com.example.mutsamarket.salesitem;
 
 import com.example.mutsamarket.ResponseDto;
-import com.example.mutsamarket.dto.item.*;
 import com.example.mutsamarket.salesitem.dto.RequestItemDto;
 import com.example.mutsamarket.salesitem.dto.RequestUserDto;
 import com.example.mutsamarket.salesitem.dto.ResponseItemDto;
