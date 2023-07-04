@@ -1,6 +1,5 @@
 package com.example.mutsamarket.dto.item;
 
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;

@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,46 +19,50 @@ public class SalesItemController {
     private final SalesItemService itemService;
 
     @PostMapping
-    public ResponseDto create(@Valid @RequestBody RequestItemDto dto) {
-        return itemService.addItem(dto);
+    public ResponseEntity<ResponseDto> create(@Valid @RequestBody RequestItemDto dto) {
+        itemService.addItem(dto);
+        return ResponseEntity.ok(ResponseDto.getInstance("등록이 완료되었습니다."));
     }
 
     @GetMapping
-    public Page<ResponseItemsDto> readAll(
+    public ResponseEntity<Page<ResponseItemsDto>> readAll(
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "limit", defaultValue = "25") Integer limit
     ) {
-        return itemService.readAllItems(page, limit);
+        return ResponseEntity.ok(itemService.readAllItems(page, limit));
     }
 
     @GetMapping("/{itemId}")
-    public ResponseItemDto readOne(
+    public ResponseEntity<ResponseItemDto> readOne(
             @PathVariable("itemId") Long itemId
     ) {
-        return itemService.readOneItem(itemId);
+        return ResponseEntity.ok(itemService.readOneItem(itemId));
     }
 
     @PutMapping("/{itemId}")
-    public ResponseDto update(
+    public ResponseEntity<ResponseDto> update(
             @PathVariable("itemId") Long itemId, @Valid @RequestBody RequestItemDto dto
     ) {
-        return itemService.updateItemInfo(itemId, dto);
+        itemService.updateItemInfo(itemId, dto);
+        return ResponseEntity.ok(ResponseDto.getInstance("물품이 수정되었습니다."));
     }
 
     @PutMapping(value = "/{itemId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseDto updateImage(
+    public ResponseEntity<ResponseDto> updateImage(
             @PathVariable("itemId") Long itemId,
             @RequestParam("image") MultipartFile itemImage,
             @RequestParam("writer") String writer,
             @RequestParam("password") String password
     ) {
-        return itemService.updateItemImage(itemId, itemImage, writer, password);
+        itemService.updateItemImage(itemId, itemImage, writer, password);
+        return ResponseEntity.ok(ResponseDto.getInstance("이미지가 등록되었습니다."));
     }
 
     @DeleteMapping("/{itemId}")
-    public ResponseDto delete(
+    public ResponseEntity<ResponseDto> delete(
             @PathVariable("itemId") Long itemId, @RequestBody RequestUserDto dto
     ) {
-        return itemService.deleteItem(itemId, dto);
+        itemService.deleteItem(itemId, dto);
+        return ResponseEntity.ok(ResponseDto.getInstance("물품을 삭제했습니다."));
     }
 }
