@@ -1,5 +1,6 @@
 package com.example.mutsamarket.controller;
 
+import com.example.mutsamarket.Entity.NegotiationStatus;
 import com.example.mutsamarket.dto.ResponseDto;
 import com.example.mutsamarket.dto.nego.RequestNegotiationDto;
 import com.example.mutsamarket.dto.nego.RequestNegotiationUserDto;
@@ -8,6 +9,7 @@ import com.example.mutsamarket.service.NegotiationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,41 +20,57 @@ public class NegotiationController {
 
     // 제안 등록
     @PostMapping
-    public ResponseDto createProposal(
+    public ResponseEntity<ResponseDto> createProposal(
             @Valid @RequestBody RequestNegotiationDto dto,
             @PathVariable Long itemId
     ) {
-        return negotiationService.addProposal(itemId, dto);
+        negotiationService.addProposal(itemId, dto);
+        return ResponseEntity.ok(ResponseDto.getInstance("구매 제안이 등록되었습니다."));
     }
 
     // 제안 조회
     @GetMapping
-    public Page<ResponseNegotiationDto> readProposal(
+    public ResponseEntity<Page<ResponseNegotiationDto>> readProposal(
             @PathVariable Long itemId,
             @RequestParam("writer") String writer,
             @RequestParam("password") String password,
             @RequestParam("page") Integer page
     ) {
-        return negotiationService.readProposal(itemId, writer, password, page);
+        return ResponseEntity.ok(negotiationService.readProposal(itemId, writer, password, page));
     }
 
     // 제안 수정
     @PutMapping("/{proposalId}")
-    public ResponseDto updateProposal(
+    public ResponseEntity<ResponseDto> updateProposal(
             @PathVariable("itemId") Long itemId,
             @PathVariable("proposalId") Long proposalId,
             @Valid @RequestBody RequestNegotiationDto dto
     ) {
-        return negotiationService.updateProposal(itemId, proposalId, dto);
+        // 가격 변경
+        if (dto.getStatus() == null) {
+            negotiationService.updatePrice(itemId, proposalId, dto);
+            return ResponseEntity.ok(ResponseDto.getInstance("제안이 수정되었습니다."));
+        }
+
+        else {
+            if (dto.getStatus().equals(NegotiationStatus.CONFIRMED.getStatus())) {
+                negotiationService.acceptProposal(itemId, proposalId, dto);
+                return ResponseEntity.ok(ResponseDto.getInstance("구매가 확정되었습니다."));
+            } else {
+                negotiationService.updateStatus(itemId, proposalId, dto);
+                return ResponseEntity.ok(ResponseDto.getInstance("제안의 상태가 변경되었습니다."));
+            }
+        }
     }
 
     // 제안 삭제
     @DeleteMapping("/{proposalId}")
-    public ResponseDto deleteProposal(
+    public ResponseEntity<ResponseDto> deleteProposal(
             @PathVariable("itemId") Long itemId,
             @PathVariable("proposalId") Long proposalId,
             @RequestBody RequestNegotiationUserDto dto
     ) {
-        return negotiationService.deleteProposal(itemId, proposalId, dto);
+        negotiationService.deleteProposal(itemId, proposalId, dto);
+        return ResponseEntity.ok(ResponseDto.getInstance("제안을 삭제했습니다."));
     }
 }

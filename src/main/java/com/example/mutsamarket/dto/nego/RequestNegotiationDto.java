@@ -1,7 +1,6 @@
 package com.example.mutsamarket.dto.nego;
 
-import com.example.mutsamarket.Entity.Negotiation;
-import jakarta.persistence.Column;
+import com.example.mutsamarket.Entity.NegotiationStatus;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 

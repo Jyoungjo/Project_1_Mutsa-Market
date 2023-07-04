@@ -1,6 +1,7 @@
 package com.example.mutsamarket.dto.nego;
 
 import com.example.mutsamarket.Entity.Negotiation;
+import com.example.mutsamarket.Entity.NegotiationStatus;
 import lombok.Data;
 
 @Data
