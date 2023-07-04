@@ -24,7 +24,7 @@ public class SalesItem {
 
     private Integer minPriceWanted;
 
-    private ItemStatus status;
+    private String status;
 
     @Column(unique = true)
     private String writer;
@@ -36,7 +36,7 @@ public class SalesItem {
         newItem.title = dto.getTitle();
         newItem.description = dto.getDescription();
         newItem.minPriceWanted = dto.getMinPriceWanted();
-        newItem.status = ItemStatus.ON_SALE;
+        newItem.status = ItemStatus.ON_SALE.getStatus();
         newItem.writer = dto.getWriter();
         newItem.password = dto.getPassword();
         return newItem;
@@ -60,5 +60,9 @@ public class SalesItem {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

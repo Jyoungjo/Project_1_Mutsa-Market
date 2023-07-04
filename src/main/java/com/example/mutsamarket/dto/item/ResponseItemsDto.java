@@ -1,6 +1,5 @@
 package com.example.mutsamarket.dto.item;
 
-import com.example.mutsamarket.Entity.ItemStatus;
 import com.example.mutsamarket.Entity.SalesItem;
 import lombok.Data;
 
@@ -16,7 +15,7 @@ public class ResponseItemsDto {
 
     private String imageUrl;
 
-    private ItemStatus status;
+    private String status;
 
     public static ResponseItemsDto fromEntity(SalesItem salesItem) {
         ResponseItemsDto dto = new ResponseItemsDto();

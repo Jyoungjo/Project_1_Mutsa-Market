@@ -1,6 +1,5 @@
 package com.example.mutsamarket.dto.item;
 
-import com.example.mutsamarket.Entity.ItemStatus;
 import com.example.mutsamarket.Entity.SalesItem;
 import lombok.Data;
 
@@ -12,7 +11,7 @@ public class ResponseItemDto {
 
     private Integer minPriceWanted;
 
-    private ItemStatus status;
+    private String status;
 
     public static ResponseItemDto fromEntity(SalesItem salesItem) {
         ResponseItemDto dto = new ResponseItemDto();
