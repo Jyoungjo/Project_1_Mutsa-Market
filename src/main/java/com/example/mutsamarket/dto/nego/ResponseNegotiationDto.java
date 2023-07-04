@@ -11,6 +11,7 @@ public class ResponseNegotiationDto {
 
     public static ResponseNegotiationDto fromEntity(Negotiation negotiation) {
         ResponseNegotiationDto dto = new ResponseNegotiationDto();
+        dto.setId(negotiation.getId());
         dto.setStatus(negotiation.getStatus());
         dto.setSuggestedPrice(negotiation.getSuggestedPrice());
         return dto;

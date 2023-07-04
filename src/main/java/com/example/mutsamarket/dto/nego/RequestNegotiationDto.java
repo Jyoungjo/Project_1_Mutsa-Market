@@ -18,14 +18,4 @@ public class RequestNegotiationDto {
 
     @NotBlank
     private String password;
-
-    public static RequestNegotiationDto fromEntity(Negotiation negotiation) {
-        RequestNegotiationDto dto = new RequestNegotiationDto();
-        dto.setItemId(negotiation.getItemId());
-        dto.setSuggestedPrice(negotiation.getSuggestedPrice());
-        dto.setStatus(negotiation.getStatus());
-        dto.setWriter(negotiation.getWriter());
-        dto.setPassword(negotiation.getPassword());
-        return dto;
-    }
 }
