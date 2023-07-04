@@ -1,7 +1,5 @@
 package com.example.mutsamarket.dto.comment;
 
-import com.example.mutsamarket.Entity.Comment;
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 

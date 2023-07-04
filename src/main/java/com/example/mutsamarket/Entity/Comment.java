@@ -1,12 +1,16 @@
 package com.example.mutsamarket.Entity;
 
+import com.example.mutsamarket.dto.comment.RequestCommentDto;
+import com.example.mutsamarket.dto.comment.RequestReplyDto;
+import com.example.mutsamarket.exceptions.notmatch.NotMatchPasswordException;
+import com.example.mutsamarket.exceptions.notmatch.NotMatchWriterException;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
-@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
 @Entity
-@RequiredArgsConstructor
 @Table(name = "comment")
 public class Comment {
     @Id
@@ -23,4 +27,31 @@ public class Comment {
     private String content;
 
     private String reply;
+
+    public static Comment getInstance(RequestCommentDto dto, Long itemId) {
+        Comment newComment = new Comment();
+        newComment.itemId = itemId;
+        newComment.writer = dto.getWriter();
+        newComment.password = dto.getPassword();
+        newComment.content = dto.getContent();
+        return newComment;
+    }
+
+    public void update(RequestCommentDto dto) {
+        this.content = dto.getContent();
+    }
+
+    public void setReply(RequestReplyDto dto) {
+        this.reply = dto.getReply();
+    }
+
+    public void checkAuthority(String writer, String password) {
+        if (!this.writer.equals(writer)) {
+            throw new NotMatchWriterException();
+        }
+
+        if (!this.password.equals(password)) {
+            throw new NotMatchPasswordException();
+        }
+    }
 }
