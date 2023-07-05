@@ -18,9 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 @Slf4j
 @Service
@@ -57,9 +55,9 @@ public class NegotiationService {
         if (writer.equals(negotiation.getWriter()) && password.equals(negotiation.getPassword())) {
             negotiationPage = negotiationRepository.findAllByItemIdAndWriterLikeAndPasswordLike(itemId, writer, password, pageable);
             return negotiationPage.map(ResponseNegotiationDto::fromEntity);
-        } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
+
+        throw new NotFoundNegotiationException();
     }
 
     // 가격 변경
