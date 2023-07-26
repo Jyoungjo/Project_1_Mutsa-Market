@@ -23,3 +23,6 @@ spring:
     resources:
       # 정적 파일 탐색 장소
       static-locations: file:itemImages/,classpath:/static
+
+jwt:
+  secret: aaaabbbsdifqbvaesoioegwaaaabbbsdifqbvaesoioegwaaaabbbsdifqbvaesasdfqve
