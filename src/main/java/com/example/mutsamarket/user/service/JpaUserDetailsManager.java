@@ -37,7 +37,7 @@ public class JpaUserDetailsManager implements UserDetailsManager {
 
     @Override
     public void deleteUser(String username) {
-        UserEntity userEntity = userRepository.findByUsername(username).orElseThrow(NotFoundUserException::new);;
+        UserEntity userEntity = userRepository.findByUsername(username).orElseThrow(NotFoundUserException::new);
         userRepository.delete(userEntity);
     }
 
