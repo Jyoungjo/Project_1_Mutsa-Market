@@ -1,10 +1,11 @@
 package com.example.mutsamarket.comment;
 
+import com.example.mutsamarket.comment.entity.Comment;
 import com.example.mutsamarket.salesitem.entity.SalesItem;
-import com.example.mutsamarket.comment.commentDTO.RequestCommentDto;
-import com.example.mutsamarket.comment.commentDTO.RequestCommentUserDto;
-import com.example.mutsamarket.comment.commentDTO.RequestReplyDto;
-import com.example.mutsamarket.comment.commentDTO.ResponseCommentDto;
+import com.example.mutsamarket.comment.dto.RequestCommentDto;
+import com.example.mutsamarket.comment.dto.RequestCommentUserDto;
+import com.example.mutsamarket.comment.dto.RequestReplyDto;
+import com.example.mutsamarket.comment.dto.ResponseCommentDto;
 import com.example.mutsamarket.exceptions.notfound.NotFoundCommentException;
 import com.example.mutsamarket.exceptions.notfound.NotFoundItemException;
 import com.example.mutsamarket.exceptions.notmatch.NotMatchItemIdException;

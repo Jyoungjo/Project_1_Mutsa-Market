@@ -1,6 +1,6 @@
 package com.example.mutsamarket.comment;
 
-import com.example.mutsamarket.comment.Comment;
+import com.example.mutsamarket.comment.entity.Comment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

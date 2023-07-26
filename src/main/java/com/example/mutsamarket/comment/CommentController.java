@@ -1,10 +1,10 @@
 package com.example.mutsamarket.comment;
 
 import com.example.mutsamarket.ResponseDto;
-import com.example.mutsamarket.comment.commentDTO.RequestCommentDto;
-import com.example.mutsamarket.comment.commentDTO.RequestCommentUserDto;
-import com.example.mutsamarket.comment.commentDTO.RequestReplyDto;
-import com.example.mutsamarket.comment.commentDTO.ResponseCommentDto;
+import com.example.mutsamarket.comment.dto.RequestCommentDto;
+import com.example.mutsamarket.comment.dto.RequestCommentUserDto;
+import com.example.mutsamarket.comment.dto.RequestReplyDto;
+import com.example.mutsamarket.comment.dto.ResponseCommentDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

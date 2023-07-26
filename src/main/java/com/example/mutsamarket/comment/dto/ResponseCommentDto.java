@@ -1,6 +1,6 @@
-package com.example.mutsamarket.comment.commentDTO;
+package com.example.mutsamarket.comment.dto;
 
-import com.example.mutsamarket.comment.Comment;
+import com.example.mutsamarket.comment.entity.Comment;
 import lombok.Data;
 
 @Data

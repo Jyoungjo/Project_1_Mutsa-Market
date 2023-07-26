@@ -1,7 +1,7 @@
-package com.example.mutsamarket.comment;
+package com.example.mutsamarket.comment.entity;
 
-import com.example.mutsamarket.comment.commentDTO.RequestCommentDto;
-import com.example.mutsamarket.comment.commentDTO.RequestReplyDto;
+import com.example.mutsamarket.comment.dto.RequestCommentDto;
+import com.example.mutsamarket.comment.dto.RequestReplyDto;
 import com.example.mutsamarket.exceptions.notmatch.NotMatchPasswordException;
 import com.example.mutsamarket.exceptions.notmatch.NotMatchWriterException;
 import jakarta.persistence.*;

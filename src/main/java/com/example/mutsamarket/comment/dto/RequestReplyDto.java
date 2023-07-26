@@ -1,20 +1,14 @@
-package com.example.mutsamarket.comment.commentDTO;
+package com.example.mutsamarket.comment.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-public class RequestCommentDto {
-    private Long itemId;
-
+public class RequestReplyDto {
     @NotBlank
     private String writer;
-
     @NotBlank
     private String password;
-
     @NotBlank
-    private String content;
-
     private String reply;
 }
