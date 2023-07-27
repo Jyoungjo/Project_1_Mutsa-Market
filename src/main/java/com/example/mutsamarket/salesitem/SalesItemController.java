@@ -5,13 +5,11 @@ import com.example.mutsamarket.salesitem.dto.RequestItemDto;
 import com.example.mutsamarket.salesitem.dto.RequestUserDto;
 import com.example.mutsamarket.salesitem.dto.ResponseItemDto;
 import com.example.mutsamarket.salesitem.dto.ResponseItemsDto;
-import com.example.mutsamarket.user.entity.UserEntity;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
