@@ -1,6 +1,4 @@
-package com.example.mutsamarket.exceptions.notfound;
-
-import com.example.mutsamarket.exceptions.Status404Exception;
+package com.example.mutsamarket.exceptions.status404;
 
 public class NotFoundNegotiationException extends Status404Exception {
     public NotFoundNegotiationException() {

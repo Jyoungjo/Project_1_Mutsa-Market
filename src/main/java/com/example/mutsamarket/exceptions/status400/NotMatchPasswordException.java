@@ -1,6 +1,4 @@
-package com.example.mutsamarket.exceptions.notmatch;
-
-import com.example.mutsamarket.exceptions.Status400Exception;
+package com.example.mutsamarket.exceptions.status400;
 
 public class NotMatchPasswordException extends Status400Exception {
     public NotMatchPasswordException() {
