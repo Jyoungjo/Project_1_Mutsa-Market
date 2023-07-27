@@ -1,16 +1,20 @@
 package com.example.mutsamarket.salesitem.entity;
 
+import com.example.mutsamarket.comment.entity.Comment;
+import com.example.mutsamarket.negotiation.entity.Negotiation;
 import com.example.mutsamarket.salesitem.dto.RequestItemDto;
 import com.example.mutsamarket.exceptions.notmatch.NotMatchPasswordException;
 import com.example.mutsamarket.exceptions.notmatch.NotMatchWriterException;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Entity
-@Table(name = "salesItem")
+@Table(name = "sales_item")
 public class SalesItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,6 +34,12 @@ public class SalesItem {
     private String writer;
 
     private String password;
+
+    @OneToMany(mappedBy = "salesItem", cascade = CascadeType.ALL)
+    private List<Comment> comments;
+
+    @OneToMany(mappedBy = "salesItem", cascade = CascadeType.ALL)
+    private List<Negotiation> negotiations;
 
     public static SalesItem getInstance(RequestItemDto dto) {
         SalesItem newItem = new SalesItem();
@@ -64,5 +74,22 @@ public class SalesItem {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    // 매핑 관련
+    public void addComment(Comment comment) {
+        if (!comments.contains(comment)) comments.add(comment);
+    }
+
+    public void deleteComment(Comment comment) {
+        comments.remove(comment);
+    }
+
+    public void addNegotiation(Negotiation negotiation) {
+        if (!negotiations.contains(negotiation)) negotiations.add(negotiation);
+    }
+
+    public void deleteNegotiation(Negotiation negotiation) {
+        negotiations.remove(negotiation);
     }
 }

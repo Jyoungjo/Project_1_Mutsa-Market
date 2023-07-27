@@ -2,8 +2,10 @@ package com.example.mutsamarket.comment.entity;
 
 import com.example.mutsamarket.comment.dto.RequestCommentDto;
 import com.example.mutsamarket.comment.dto.RequestReplyDto;
+import com.example.mutsamarket.exceptions.notmatch.NotMatchItemException;
 import com.example.mutsamarket.exceptions.notmatch.NotMatchPasswordException;
 import com.example.mutsamarket.exceptions.notmatch.NotMatchWriterException;
+import com.example.mutsamarket.salesitem.entity.SalesItem;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,7 +19,9 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long itemId;
+    @ManyToOne
+    @JoinColumn(name = "item_id")
+    private SalesItem salesItem;
 
     @Column(unique = true)
     private String writer;
@@ -28,13 +32,18 @@ public class Comment {
 
     private String reply;
 
-    public static Comment getInstance(RequestCommentDto dto, Long itemId) {
+    public static Comment getInstance(RequestCommentDto dto) {
         Comment newComment = new Comment();
-        newComment.itemId = itemId;
         newComment.writer = dto.getWriter();
         newComment.password = dto.getPassword();
         newComment.content = dto.getContent();
         return newComment;
+    }
+
+    public void setSalesItem(SalesItem item) {
+        if (this.salesItem != null) this.salesItem.getComments().remove(this);
+        this.salesItem = item;
+        item.addComment(this);
     }
 
     public void update(RequestCommentDto dto) {
@@ -52,6 +61,12 @@ public class Comment {
 
         if (!this.password.equals(password)) {
             throw new NotMatchPasswordException();
+        }
+    }
+
+    public void checkItem(Long itemId) {
+        if (!salesItem.getId().equals(itemId)) {
+            throw new NotMatchItemException();
         }
     }
 }

@@ -1,8 +1,10 @@
 package com.example.mutsamarket.negotiation.entity;
 
+import com.example.mutsamarket.exceptions.notmatch.NotMatchItemException;
 import com.example.mutsamarket.negotiation.dto.RequestNegotiationDto;
 import com.example.mutsamarket.exceptions.notmatch.NotMatchPasswordException;
 import com.example.mutsamarket.exceptions.notmatch.NotMatchWriterException;
+import com.example.mutsamarket.salesitem.entity.SalesItem;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,7 +18,9 @@ public class Negotiation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long itemId;
+    @ManyToOne
+    @JoinColumn(name = "item_id")
+    private SalesItem salesItem;
 
     private Integer suggestedPrice;
 
@@ -27,9 +31,8 @@ public class Negotiation {
 
     private String password;
 
-    public static Negotiation getInstance(Long itemId, RequestNegotiationDto dto) {
+    public static Negotiation getInstance(RequestNegotiationDto dto) {
         Negotiation newNegotiation = new Negotiation();
-        newNegotiation.itemId = itemId;
         newNegotiation.suggestedPrice = dto.getSuggestedPrice();
         newNegotiation.status = NegotiationStatus.PROPOSED.getStatus();
         newNegotiation.writer = dto.getWriter();
@@ -45,6 +48,12 @@ public class Negotiation {
         this.status = status;
     }
 
+    public void setSalesItem(SalesItem item) {
+        if (this.salesItem != null) this.salesItem.getNegotiations().remove(this);
+        this.salesItem = item;
+        item.addNegotiation(this);
+    }
+
     public void checkAuthority(String writer, String password) {
         if (!this.writer.equals(writer)) {
             throw new NotMatchWriterException();
@@ -52,6 +61,12 @@ public class Negotiation {
 
         if (!this.password.equals(password)) {
             throw new NotMatchPasswordException();
+        }
+    }
+
+    public void checkItem(Long itemId) {
+        if (!salesItem.getId().equals(itemId)) {
+            throw new NotMatchItemException();
         }
     }
 }
