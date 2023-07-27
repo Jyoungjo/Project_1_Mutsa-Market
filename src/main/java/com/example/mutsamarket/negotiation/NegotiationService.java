@@ -7,7 +7,6 @@ import com.example.mutsamarket.negotiation.dto.RequestNegotiationUserDto;
 import com.example.mutsamarket.negotiation.dto.ResponseNegotiationDto;
 import com.example.mutsamarket.exceptions.notfound.NotFoundItemException;
 import com.example.mutsamarket.exceptions.notfound.NotFoundNegotiationException;
-import com.example.mutsamarket.exceptions.notmatch.NotMatchItemIdException;
 import com.example.mutsamarket.exceptions.notmatch.NotMatchStatusException;
 import com.example.mutsamarket.salesitem.SalesItemRepository;
 import com.example.mutsamarket.salesitem.entity.ItemStatus;
@@ -29,10 +28,10 @@ public class NegotiationService {
 
     // 구매 제안 등록
     public void addProposal(Long itemId, RequestNegotiationDto dto) {
-        if (!itemRepository.existsById(itemId)) {
-            throw new NotFoundItemException();
-        }
-        negotiationRepository.save(Negotiation.getInstance(itemId, dto));
+        SalesItem item = itemRepository.findById(itemId).orElseThrow(NotFoundItemException::new);
+        Negotiation negotiation = Negotiation.getInstance(dto);
+        negotiation.setSalesItem(item);
+        negotiationRepository.save(negotiation);
     }
 
     // 구매 제안 조회
@@ -45,15 +44,18 @@ public class NegotiationService {
 
         Page<Negotiation> negotiationPage;
 
+        // 검증
+        // 물품 등록자
         if (writer.equals(item.getWriter()) && password.equals(item.getPassword())) {
-            negotiationPage = negotiationRepository.findAllByItemId(itemId, pageable);
+            negotiationPage = negotiationRepository.findAllBySalesItem(item, pageable);
             return negotiationPage.map(ResponseNegotiationDto::fromEntity);
         }
 
         Negotiation negotiation = negotiationRepository.findByWriter(writer).orElseThrow(NotFoundNegotiationException::new);
 
+        // 제안 등록자
         if (writer.equals(negotiation.getWriter()) && password.equals(negotiation.getPassword())) {
-            negotiationPage = negotiationRepository.findAllByItemIdAndWriterLikeAndPasswordLike(itemId, writer, password, pageable);
+            negotiationPage = negotiationRepository.findAllBySalesItemAndWriterLikeAndPasswordLike(item, writer, password, pageable);
             return negotiationPage.map(ResponseNegotiationDto::fromEntity);
         }
 
@@ -64,7 +66,8 @@ public class NegotiationService {
     public void updatePrice(Long itemId, Long proposalId, RequestNegotiationDto dto) {
         Negotiation negotiation = negotiationRepository.findById(proposalId).orElseThrow(NotFoundNegotiationException::new);
 
-        checkItemId(itemId, negotiation);
+        // 검증
+        negotiation.checkItem(itemId);
         negotiation.checkAuthority(dto.getWriter(), dto.getPassword());
 
         negotiation.updatePrice(dto);
@@ -76,7 +79,7 @@ public class NegotiationService {
         SalesItem item = itemRepository.findById(itemId).orElseThrow(NotFoundItemException::new);
         Negotiation negotiation = negotiationRepository.findById(proposalId).orElseThrow(NotFoundNegotiationException::new);
 
-        checkItemId(itemId, negotiation);
+        negotiation.checkItem(itemId);
 
         item.checkAuthority(dto.getWriter(), dto.getPassword());
 
@@ -89,7 +92,7 @@ public class NegotiationService {
         SalesItem item = itemRepository.findById(itemId).orElseThrow(NotFoundItemException::new);
         Negotiation negotiation = negotiationRepository.findById(proposalId).orElseThrow(NotFoundNegotiationException::new);
 
-        checkItemId(itemId, negotiation);
+        negotiation.checkItem(itemId);
         negotiation.checkAuthority(dto.getWriter(), dto.getPassword());
 
         if (negotiation.getStatus().equals(NegotiationStatus.ACCEPTED.getStatus())) {
@@ -100,7 +103,7 @@ public class NegotiationService {
             item.setStatus(ItemStatus.SOLD.getStatus());
             itemRepository.save(item);
 
-            for (Negotiation nego : negotiationRepository.findAllByItemId(itemId)) {
+            for (Negotiation nego : negotiationRepository.findAllBySalesItem(item)) {
                 if (!nego.getStatus().equals(NegotiationStatus.CONFIRMED.getStatus())) {
                     nego.setStatus(NegotiationStatus.REJECTED.getStatus());
                     negotiationRepository.save(nego);
@@ -117,15 +120,10 @@ public class NegotiationService {
     public void deleteProposal(Long itemId, Long proposalId, RequestNegotiationUserDto dto) {
         Negotiation negotiation = negotiationRepository.findById(proposalId).orElseThrow(NotFoundNegotiationException::new);
 
-        checkItemId(itemId, negotiation);
+        negotiation.checkItem(itemId);
         negotiation.checkAuthority(dto.getWriter(), dto.getPassword());
 
+        negotiation.getSalesItem().deleteNegotiation(negotiation);
         negotiationRepository.deleteById(proposalId);
-    }
-
-    private void checkItemId(Long itemId, Negotiation negotiation) {
-        if (!itemId.equals(negotiation.getItemId())) {
-            throw new NotMatchItemIdException();
-        }
     }
 }
