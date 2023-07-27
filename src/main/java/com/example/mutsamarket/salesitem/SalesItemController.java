@@ -1,6 +1,6 @@
 package com.example.mutsamarket.salesitem;
 
-import com.example.mutsamarket.ResponseDto;
+import com.example.mutsamarket.response.ResponseDto;
 import com.example.mutsamarket.salesitem.dto.RequestItemDto;
 import com.example.mutsamarket.salesitem.dto.RequestUserDto;
 import com.example.mutsamarket.salesitem.dto.ResponseItemDto;
@@ -53,10 +53,10 @@ public class SalesItemController {
     public ResponseEntity<ResponseDto> updateImage(
             @PathVariable("itemId") Long itemId,
             @RequestParam("image") MultipartFile itemImage,
-            @RequestParam("writer") String writer,
+            @RequestParam("username") String username,
             @RequestParam("password") String password
     ) {
-        itemService.updateItemImage(itemId, itemImage, writer, password);
+        itemService.updateItemImage(itemId, itemImage, username, password);
         return ResponseEntity.ok(ResponseDto.getInstance("이미지가 등록되었습니다."));
     }
 

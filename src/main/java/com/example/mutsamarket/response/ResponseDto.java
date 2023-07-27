@@ -1,4 +1,4 @@
-package com.example.mutsamarket;
+package com.example.mutsamarket.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

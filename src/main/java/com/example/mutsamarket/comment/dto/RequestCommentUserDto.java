@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class RequestCommentUserDto {
-    private String writer;
+    private String username;
     private String password;
 }

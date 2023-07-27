@@ -1,17 +1,16 @@
 package com.example.mutsamarket.user.service;
 
-import com.example.mutsamarket.exceptions.notfound.NotFoundUserException;
+import com.example.mutsamarket.exceptions.status400.ExistentUserException;
+import com.example.mutsamarket.exceptions.status404.NotFoundUserException;
 import com.example.mutsamarket.user.UserRepository;
 import com.example.mutsamarket.user.entity.CustomUserDetails;
 import com.example.mutsamarket.user.entity.UserEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 @Slf4j
 @Service
@@ -21,9 +20,7 @@ public class JpaUserDetailsManager implements UserDetailsManager {
 
     @Override
     public void createUser(UserDetails user) {
-        if (this.userExists(user.getUsername())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
+        if (this.userExists(user.getUsername())) throw new ExistentUserException();
 
         userRepository.save(((CustomUserDetails) user).getInstance());
     }

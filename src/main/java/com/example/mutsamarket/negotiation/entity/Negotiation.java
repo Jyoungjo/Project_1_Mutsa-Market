@@ -1,8 +1,8 @@
 package com.example.mutsamarket.negotiation.entity;
 
 import com.example.mutsamarket.negotiation.dto.RequestNegotiationDto;
-import com.example.mutsamarket.exceptions.notmatch.NotMatchPasswordException;
-import com.example.mutsamarket.exceptions.notmatch.NotMatchWriterException;
+import com.example.mutsamarket.salesitem.entity.SalesItem;
+import com.example.mutsamarket.user.entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,24 +16,22 @@ public class Negotiation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long itemId;
+    @ManyToOne
+    @JoinColumn(name = "item_id")
+    private SalesItem salesItem;
 
     private Integer suggestedPrice;
 
     private String status;
 
-    @Column(unique = true)
-    private String writer;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private UserEntity user;
 
-    private String password;
-
-    public static Negotiation getInstance(Long itemId, RequestNegotiationDto dto) {
+    public static Negotiation getInstance(RequestNegotiationDto dto) {
         Negotiation newNegotiation = new Negotiation();
-        newNegotiation.itemId = itemId;
         newNegotiation.suggestedPrice = dto.getSuggestedPrice();
         newNegotiation.status = NegotiationStatus.PROPOSED.getStatus();
-        newNegotiation.writer = dto.getWriter();
-        newNegotiation.password = dto.getPassword();
         return newNegotiation;
     }
 
@@ -45,13 +43,15 @@ public class Negotiation {
         this.status = status;
     }
 
-    public void checkAuthority(String writer, String password) {
-        if (!this.writer.equals(writer)) {
-            throw new NotMatchWriterException();
-        }
+    public void setSalesItem(SalesItem item) {
+        if (this.salesItem != null) this.salesItem.getNegotiations().remove(this);
+        this.salesItem = item;
+        item.addNegotiation(this);
+    }
 
-        if (!this.password.equals(password)) {
-            throw new NotMatchPasswordException();
-        }
+    public void setUser(UserEntity user) {
+        if (this.user != null) this.user.getNegotiations().remove(this);
+        this.user = user;
+        user.addNegotiation(this);
     }
 }
