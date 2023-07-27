@@ -19,7 +19,7 @@ public class RequestItemDto {
     private String status;
 
     @NotBlank
-    private String writer;
+    private String username;
 
     @NotBlank
     private String password;

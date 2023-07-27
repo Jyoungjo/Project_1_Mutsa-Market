@@ -1,11 +1,15 @@
 package com.example.mutsamarket.salesitem;
 
-import com.example.mutsamarket.exceptions.notfound.NotFoundItemException;
+import com.example.mutsamarket.exceptions.status403.NotMatchUserException;
+import com.example.mutsamarket.exceptions.status404.NotFoundItemException;
+import com.example.mutsamarket.exceptions.status404.NotFoundUserException;
 import com.example.mutsamarket.salesitem.entity.SalesItem;
 import com.example.mutsamarket.salesitem.dto.RequestItemDto;
 import com.example.mutsamarket.salesitem.dto.RequestUserDto;
 import com.example.mutsamarket.salesitem.dto.ResponseItemDto;
 import com.example.mutsamarket.salesitem.dto.ResponseItemsDto;
+import com.example.mutsamarket.user.UserRepository;
+import com.example.mutsamarket.user.entity.UserEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -13,6 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
@@ -26,10 +31,16 @@ import java.nio.file.Path;
 @RequiredArgsConstructor
 public class SalesItemService {
     private final SalesItemRepository itemRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     // 물품 등록
     public void addItem(RequestItemDto dto) {
-        itemRepository.save(SalesItem.getInstance(dto));
+        SalesItem salesItem = SalesItem.getInstance(dto);
+        UserEntity user = userRepository.findByUsername(dto.getUsername()).orElseThrow(NotFoundUserException::new);
+
+        salesItem.setUser(user);
+        itemRepository.save(salesItem);
     }
 
     // 물품 전체 조회 (페이지 단위)
@@ -49,15 +60,16 @@ public class SalesItemService {
     // 등록 물품 정보 수정
     public void updateItemInfo(Long itemId, RequestItemDto dto) {
         SalesItem salesItem = itemRepository.findById(itemId).orElseThrow(NotFoundItemException::new);
-        salesItem.checkAuthority(dto.getWriter(), dto.getPassword());
+
+        checkAuthority(salesItem, dto.getUsername(), dto.getPassword());
         salesItem.updateInfo(dto);
         itemRepository.save(salesItem);
     }
 
     // 등록 물품 이미지 첨부
-    public void updateItemImage(Long itemId, MultipartFile itemImage, String writer, String password) {
+    public void updateItemImage(Long itemId, MultipartFile itemImage, String username, String password) {
         SalesItem salesItem = itemRepository.findById(itemId).orElseThrow(NotFoundItemException::new);
-        salesItem.checkAuthority(writer, password);
+        checkAuthority(salesItem, username, password);
 
         String itemImagesDir = String.format("itemImages/%d/", itemId);
         try {
@@ -87,7 +99,17 @@ public class SalesItemService {
     // 등록 물품 삭제
     public void deleteItem(Long itemId, RequestUserDto dto) {
         SalesItem salesItem = itemRepository.findById(itemId).orElseThrow(NotFoundItemException::new);
-        salesItem.checkAuthority(dto.getWriter(), dto.getPassword());
+
+        checkAuthority(salesItem, dto.getUsername(), dto.getPassword());
+        salesItem.getUser().deleteSalesItem(salesItem);
+
         itemRepository.deleteById(itemId);
+    }
+
+    // 사용자 인증 메소드
+    private void checkAuthority(SalesItem item, String username, String password) {
+        if (!item.getUser().getUsername().equals(username) || !passwordEncoder.matches(password, item.getUser().getPassword())) {
+            throw new NotMatchUserException();
+        }
     }
 }

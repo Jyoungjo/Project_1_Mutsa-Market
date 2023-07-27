@@ -12,7 +12,7 @@ public class RequestNegotiationDto {
     private String status;
 
     @NotBlank
-    private String writer;
+    private String username;
 
     @NotBlank
     private String password;

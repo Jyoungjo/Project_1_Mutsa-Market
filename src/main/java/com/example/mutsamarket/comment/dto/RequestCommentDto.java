@@ -8,7 +8,7 @@ public class RequestCommentDto {
     private Long itemId;
 
     @NotBlank
-    private String writer;
+    private String username;
 
     @NotBlank
     private String password;

@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 public class RequestReplyDto {
     @NotBlank
-    private String writer;
+    private String username;
     @NotBlank
     private String password;
     @NotBlank

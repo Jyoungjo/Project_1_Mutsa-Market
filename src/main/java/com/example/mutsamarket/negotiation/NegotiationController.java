@@ -1,6 +1,6 @@
 package com.example.mutsamarket.negotiation;
 
-import com.example.mutsamarket.ResponseDto;
+import com.example.mutsamarket.response.ResponseDto;
 import com.example.mutsamarket.negotiation.entity.NegotiationStatus;
 import com.example.mutsamarket.negotiation.dto.RequestNegotiationDto;
 import com.example.mutsamarket.negotiation.dto.RequestNegotiationUserDto;
@@ -31,11 +31,11 @@ public class NegotiationController {
     @GetMapping
     public ResponseEntity<Page<ResponseNegotiationDto>> readProposal(
             @PathVariable Long itemId,
-            @RequestParam("writer") String writer,
+            @RequestParam("username") String username,
             @RequestParam("password") String password,
             @RequestParam("page") Integer page
     ) {
-        return ResponseEntity.ok(negotiationService.readProposal(itemId, writer, password, page));
+        return ResponseEntity.ok(negotiationService.readProposal(itemId, username, password, page));
     }
 
     // 제안 수정

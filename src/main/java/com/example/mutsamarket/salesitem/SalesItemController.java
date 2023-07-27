@@ -1,15 +1,17 @@
 package com.example.mutsamarket.salesitem;
 
-import com.example.mutsamarket.ResponseDto;
+import com.example.mutsamarket.response.ResponseDto;
 import com.example.mutsamarket.salesitem.dto.RequestItemDto;
 import com.example.mutsamarket.salesitem.dto.RequestUserDto;
 import com.example.mutsamarket.salesitem.dto.ResponseItemDto;
 import com.example.mutsamarket.salesitem.dto.ResponseItemsDto;
+import com.example.mutsamarket.user.entity.UserEntity;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -53,10 +55,10 @@ public class SalesItemController {
     public ResponseEntity<ResponseDto> updateImage(
             @PathVariable("itemId") Long itemId,
             @RequestParam("image") MultipartFile itemImage,
-            @RequestParam("writer") String writer,
+            @RequestParam("username") String username,
             @RequestParam("password") String password
     ) {
-        itemService.updateItemImage(itemId, itemImage, writer, password);
+        itemService.updateItemImage(itemId, itemImage, username, password);
         return ResponseEntity.ok(ResponseDto.getInstance("이미지가 등록되었습니다."));
     }
 

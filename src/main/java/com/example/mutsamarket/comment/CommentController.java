@@ -1,6 +1,6 @@
 package com.example.mutsamarket.comment;
 
-import com.example.mutsamarket.ResponseDto;
+import com.example.mutsamarket.response.ResponseDto;
 import com.example.mutsamarket.comment.dto.RequestCommentDto;
 import com.example.mutsamarket.comment.dto.RequestCommentUserDto;
 import com.example.mutsamarket.comment.dto.RequestReplyDto;
