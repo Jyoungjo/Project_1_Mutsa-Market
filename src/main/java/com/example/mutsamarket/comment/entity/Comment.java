@@ -2,10 +2,8 @@ package com.example.mutsamarket.comment.entity;
 
 import com.example.mutsamarket.comment.dto.RequestCommentDto;
 import com.example.mutsamarket.comment.dto.RequestReplyDto;
-import com.example.mutsamarket.exceptions.notmatch.NotMatchItemException;
-import com.example.mutsamarket.exceptions.notmatch.NotMatchPasswordException;
-import com.example.mutsamarket.exceptions.notmatch.NotMatchWriterException;
 import com.example.mutsamarket.salesitem.entity.SalesItem;
+import com.example.mutsamarket.user.entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,10 +21,9 @@ public class Comment {
     @JoinColumn(name = "item_id")
     private SalesItem salesItem;
 
-    @Column(unique = true)
-    private String writer;
-
-    private String password;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private UserEntity user;
 
     private String content;
 
@@ -34,16 +31,21 @@ public class Comment {
 
     public static Comment getInstance(RequestCommentDto dto) {
         Comment newComment = new Comment();
-        newComment.writer = dto.getWriter();
-        newComment.password = dto.getPassword();
         newComment.content = dto.getContent();
         return newComment;
     }
 
+    // 매핑 관련
     public void setSalesItem(SalesItem item) {
         if (this.salesItem != null) this.salesItem.getComments().remove(this);
         this.salesItem = item;
         item.addComment(this);
+    }
+
+    public void setUser(UserEntity user) {
+        if (this.user != null) this.user.getComments().remove(this);
+        this.user = user;
+        user.addComment(this);
     }
 
     public void update(RequestCommentDto dto) {
@@ -52,21 +54,5 @@ public class Comment {
 
     public void setReply(RequestReplyDto dto) {
         this.reply = dto.getReply();
-    }
-
-    public void checkAuthority(String writer, String password) {
-        if (!this.writer.equals(writer)) {
-            throw new NotMatchWriterException();
-        }
-
-        if (!this.password.equals(password)) {
-            throw new NotMatchPasswordException();
-        }
-    }
-
-    public void checkItem(Long itemId) {
-        if (!salesItem.getId().equals(itemId)) {
-            throw new NotMatchItemException();
-        }
     }
 }

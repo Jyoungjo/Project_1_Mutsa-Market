@@ -3,8 +3,7 @@ package com.example.mutsamarket.salesitem.entity;
 import com.example.mutsamarket.comment.entity.Comment;
 import com.example.mutsamarket.negotiation.entity.Negotiation;
 import com.example.mutsamarket.salesitem.dto.RequestItemDto;
-import com.example.mutsamarket.exceptions.notmatch.NotMatchPasswordException;
-import com.example.mutsamarket.exceptions.notmatch.NotMatchWriterException;
+import com.example.mutsamarket.user.entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,10 +29,9 @@ public class SalesItem {
 
     private String status;
 
-    @Column(unique = true)
-    private String writer;
-
-    private String password;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private UserEntity user;
 
     @OneToMany(mappedBy = "salesItem", cascade = CascadeType.ALL)
     private List<Comment> comments;
@@ -47,8 +45,6 @@ public class SalesItem {
         newItem.description = dto.getDescription();
         newItem.minPriceWanted = dto.getMinPriceWanted();
         newItem.status = ItemStatus.ON_SALE.getStatus();
-        newItem.writer = dto.getWriter();
-        newItem.password = dto.getPassword();
         return newItem;
     }
 
@@ -58,14 +54,10 @@ public class SalesItem {
         this.minPriceWanted = dto.getMinPriceWanted();
     }
 
-    public void checkAuthority(String writer, String password) {
-        if (!this.writer.equals(writer)) {
-            throw new NotMatchWriterException();
-        }
-
-        if (!this.password.equals(password)) {
-            throw new NotMatchPasswordException();
-        }
+    public void setUser(UserEntity user) {
+        if (this.user != null) this.user.getSalesItems().remove(this);
+        this.user = user;
+        user.addSalesItem(this);
     }
 
     public void setImageUrl(String imageUrl) {
