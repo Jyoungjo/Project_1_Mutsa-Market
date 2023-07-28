@@ -1,6 +1,6 @@
 package com.example.mutsamarket.salesitem;
 
-import com.example.mutsamarket.exceptions.status403.NotMatchUserException;
+import com.example.mutsamarket.exceptions.status400.NotMatchUserException;
 import com.example.mutsamarket.exceptions.status404.NotFoundItemException;
 import com.example.mutsamarket.exceptions.status404.NotFoundUserException;
 import com.example.mutsamarket.salesitem.entity.SalesItem;

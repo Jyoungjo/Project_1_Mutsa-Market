@@ -2,7 +2,7 @@ package com.example.mutsamarket.comment;
 
 import com.example.mutsamarket.comment.entity.Comment;
 import com.example.mutsamarket.exceptions.status400.NotMatchItemException;
-import com.example.mutsamarket.exceptions.status403.NotMatchUserException;
+import com.example.mutsamarket.exceptions.status400.NotMatchUserException;
 import com.example.mutsamarket.salesitem.entity.SalesItem;
 import com.example.mutsamarket.comment.dto.RequestCommentDto;
 import com.example.mutsamarket.comment.dto.RequestCommentUserDto;

@@ -1,7 +1,7 @@
 package com.example.mutsamarket.user;
 
 import com.example.mutsamarket.exceptions.status400.NotMatchPasswordException;
-import com.example.mutsamarket.exceptions.status403.NotMatchUserException;
+import com.example.mutsamarket.exceptions.status400.NotMatchUserException;
 import com.example.mutsamarket.response.ResponseDto;
 import com.example.mutsamarket.user.dto.TokenDto;
 import com.example.mutsamarket.user.dto.UserRegisterDto;

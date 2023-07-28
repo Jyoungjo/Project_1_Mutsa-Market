@@ -1,7 +1,7 @@
 package com.example.mutsamarket.negotiation;
 
 import com.example.mutsamarket.exceptions.status400.NotMatchItemException;
-import com.example.mutsamarket.exceptions.status403.NotMatchUserException;
+import com.example.mutsamarket.exceptions.status400.NotMatchUserException;
 import com.example.mutsamarket.exceptions.status404.NotFoundUserException;
 import com.example.mutsamarket.negotiation.entity.Negotiation;
 import com.example.mutsamarket.negotiation.entity.NegotiationStatus;
