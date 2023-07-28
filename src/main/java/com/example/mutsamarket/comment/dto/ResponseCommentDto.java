@@ -14,7 +14,7 @@ public class ResponseCommentDto {
         ResponseCommentDto dto = new ResponseCommentDto();
         dto.setId(comment.getId());
         dto.setUsername(comment.getUser().getUsername());
-        dto.setContent(comment.getUser().getUsername());
+        dto.setContent(comment.getContent());
         dto.setReply(comment.getReply());
         return dto;
     }
