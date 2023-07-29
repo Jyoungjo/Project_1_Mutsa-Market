@@ -1,5 +1,6 @@
 package com.example.mutsamarket.user.config;
 
+import com.example.mutsamarket.user.jwt.JwtExceptionResponseFilter;
 import com.example.mutsamarket.user.jwt.JwtTokenFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -17,6 +18,7 @@ import org.springframework.security.web.access.intercept.AuthorizationFilter;
 @RequiredArgsConstructor
 public class WebSecurityConfig {
     private final JwtTokenFilter jwtTokenFilter;
+    private final JwtExceptionResponseFilter jwtExceptionResponseFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
@@ -27,7 +29,8 @@ public class WebSecurityConfig {
                                 "/users/register"
                         )
                         .permitAll()
-                        .requestMatchers(HttpMethod.GET,
+                        .requestMatchers(
+                                HttpMethod.GET,
                                 "/items",
                                 "/items/{itemId}",
                                 "/items/{itemId}/comments"
@@ -40,9 +43,8 @@ public class WebSecurityConfig {
                         sessionManagement -> sessionManagement
                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                .addFilterBefore(
-                        jwtTokenFilter, AuthorizationFilter.class
-                );
+                .addFilterBefore(jwtTokenFilter, AuthorizationFilter.class)
+                .addFilterBefore(jwtExceptionResponseFilter, JwtTokenFilter.class);
 
         return http.build();
     }

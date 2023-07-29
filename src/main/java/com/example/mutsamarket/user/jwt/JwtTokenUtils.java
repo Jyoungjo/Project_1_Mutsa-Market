@@ -1,8 +1,6 @@
 package com.example.mutsamarket.user.jwt;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtParser;
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,11 +25,12 @@ public class JwtTokenUtils {
     public boolean validate(String token) {
         try {
             jwtParser.parseClaimsJws(token);
+            log.info("validate success");
             return true;
-        } catch (Exception e) {
-            log.warn("invalid jwt: {}", e.getMessage());
-            return false;
+        } catch (JwtException e) {
+            log.warn("validate fail");
         }
+        return false;
     }
 
     public Claims parseClaims(String token) {

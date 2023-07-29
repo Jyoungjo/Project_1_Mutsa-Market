@@ -1,6 +1,7 @@
 package com.example.mutsamarket.exceptions;
 
 import com.example.mutsamarket.exceptions.status400.Status400Exception;
+import com.example.mutsamarket.exceptions.status401.Status401Exception;
 import com.example.mutsamarket.exceptions.status403.Status403Exception;
 import com.example.mutsamarket.exceptions.status404.Status404Exception;
 import com.example.mutsamarket.response.ResponseDto;
@@ -22,13 +23,22 @@ public class ExceptionController {
         return ResponseEntity.badRequest().body(response);
     }
 
-    @ExceptionHandler(Status403Exception.class)
-    public ResponseEntity<ResponseDto> handleNotFound(
-            Status403Exception exception
+    @ExceptionHandler(Status401Exception.class)
+    public ResponseEntity<ResponseDto> handleUnauthorized(
+            Status401Exception exception
     ) {
         ResponseDto response = new ResponseDto();
         response.setMessage(exception.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+    }
+
+    @ExceptionHandler(Status403Exception.class)
+    public ResponseEntity<ResponseDto> handleForbidden(
+            Status403Exception exception
+    ) {
+        ResponseDto response = new ResponseDto();
+        response.setMessage(exception.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
     }
 
     @ExceptionHandler(Status404Exception.class)
