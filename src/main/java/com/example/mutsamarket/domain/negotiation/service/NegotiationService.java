@@ -23,6 +23,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -37,8 +39,14 @@ public class NegotiationService {
 
     // 구매 제안 등록
     public void addProposal(Long itemId, RequestNegotiationDto dto) {
+        checkTokenInfo(dto.getUsername());
+
         SalesItem item = itemRepository.findById(itemId).orElseThrow(NotFoundItemException::new);
         UserEntity user = userRepository.findByUsername(dto.getUsername()).orElseThrow(NotFoundUserException::new);
+
+        if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
+            throw new NotMatchUserException();
+        }
 
         Negotiation negotiation = Negotiation.getInstance(dto);
         negotiation.setSalesItem(item);
@@ -51,10 +59,11 @@ public class NegotiationService {
     public Page<ResponseNegotiationDto> readProposal(
             Long itemId, String username, String password, Integer page
     ) {
-        Pageable pageable = PageRequest.of(page - 1, 25, Sort.by("id"));
+        checkTokenInfo(username);
 
-        SalesItem item = itemRepository.findById(itemId).orElseThrow(NotFoundItemException::new); // 유저1
-        UserEntity user = userRepository.findByUsername(username).orElseThrow(NotFoundUserException::new); // 유저2
+        SalesItem item = itemRepository.findById(itemId).orElseThrow(NotFoundItemException::new);
+        UserEntity user = userRepository.findByUsername(username).orElseThrow(NotFoundUserException::new);
+        Pageable pageable = PageRequest.of(page - 1, 25, Sort.by("id"));
 
         Page<Negotiation> negotiationPage;
 
@@ -62,25 +71,21 @@ public class NegotiationService {
         if (user.getUsername().equals(item.getUser().getUsername()) && passwordEncoder.matches(password, user.getPassword())) {
             negotiationPage = negotiationRepository.findAllBySalesItem(item, pageable);
             return negotiationPage.map(ResponseNegotiationDto::fromEntity);
-        }
-
-        Negotiation negotiation = negotiationRepository.findByUser(user).orElseThrow(NotFoundNegotiationException::new); // 유저 2
-
-        if (negotiation.getUser().getUsername().equals(username) && passwordEncoder.matches(password, user.getPassword())) {
-            negotiationPage = negotiationRepository.findAllBySalesItemAndUser(item, user, pageable);
+        } else {
+            negotiationPage = negotiationRepository.findAllBySalesItemIdAndUserId(itemId, user.getId(), pageable);
             return negotiationPage.map(ResponseNegotiationDto::fromEntity);
         }
-
-        throw new NotFoundNegotiationException();
     }
 
     // 가격 변경
     public void updatePrice(Long itemId, Long proposalId, RequestNegotiationDto dto) {
-        Negotiation negotiation = negotiationRepository.findById(proposalId).orElseThrow(NotFoundNegotiationException::new);
+        checkTokenInfo(dto.getUsername());
+
         SalesItem item = itemRepository.findById(itemId).orElseThrow(NotFoundItemException::new);
+        Negotiation negotiation = negotiationRepository.findById(proposalId).orElseThrow(NotFoundNegotiationException::new);
 
         // 검증
-        checkItem(item, itemId);
+        checkItem(item, negotiation);
         checkAuthority(negotiation, dto.getUsername(), dto.getPassword());
 
         negotiation.updatePrice(dto);
@@ -89,10 +94,12 @@ public class NegotiationService {
 
     // 상태 변경
     public void updateStatus(Long itemId, Long proposalId, RequestNegotiationDto dto) {
+        checkTokenInfo(dto.getUsername());
+
         SalesItem item = itemRepository.findById(itemId).orElseThrow(NotFoundItemException::new);
         Negotiation negotiation = negotiationRepository.findById(proposalId).orElseThrow(NotFoundNegotiationException::new);
 
-        checkItem(item, itemId);
+        checkItem(item, negotiation);
         checkAuthority(item, dto.getUsername(), dto.getPassword());
 
         negotiation.setStatus(dto.getStatus());
@@ -101,10 +108,12 @@ public class NegotiationService {
 
     // 제안 확정
     public void acceptProposal(Long itemId, Long proposalId, RequestNegotiationDto dto) {
+        checkTokenInfo(dto.getUsername());
+
         SalesItem item = itemRepository.findById(itemId).orElseThrow(NotFoundItemException::new);
         Negotiation negotiation = negotiationRepository.findById(proposalId).orElseThrow(NotFoundNegotiationException::new);
 
-        checkItem(item, itemId);
+        checkItem(item, negotiation);
         checkAuthority(negotiation, dto.getUsername(), dto.getPassword());
 
         if (negotiation.getStatus().equals(NegotiationStatus.ACCEPTED.getStatus())) {
@@ -130,10 +139,12 @@ public class NegotiationService {
 
     // 구매 제안 삭제
     public void deleteProposal(Long itemId, Long proposalId, RequestNegotiationUserDto dto) {
+        checkTokenInfo(dto.getUsername());
+
         Negotiation negotiation = negotiationRepository.findById(proposalId).orElseThrow(NotFoundNegotiationException::new);
         SalesItem item = itemRepository.findById(itemId).orElseThrow(NotFoundItemException::new);
 
-        checkItem(item, itemId);
+        checkItem(item, negotiation);
         checkAuthority(negotiation, dto.getUsername(), dto.getPassword());
 
         negotiation.getSalesItem().deleteNegotiation(negotiation);
@@ -153,9 +164,16 @@ public class NegotiationService {
         }
     }
 
-    private void checkItem(SalesItem salesItem, Long itemId) {
-        if (!salesItem.getId().equals(itemId)) {
+    private void checkItem(SalesItem salesItem, Negotiation negotiation) {
+        if (!salesItem.getId().equals(negotiation.getSalesItem().getId())) {
             throw new NotMatchItemException();
+        }
+    }
+
+    private void checkTokenInfo(String username) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (!authentication.getName().equals(username)) {
+            throw new NotMatchUserException();
         }
     }
 }

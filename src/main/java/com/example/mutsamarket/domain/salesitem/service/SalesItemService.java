@@ -18,6 +18,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,9 +39,15 @@ public class SalesItemService {
 
     // 물품 등록
     public void addItem(RequestItemDto dto) {
-        SalesItem salesItem = SalesItem.getInstance(dto);
+        checkTokenInfo(dto.getUsername());
+
         UserEntity user = userRepository.findByUsername(dto.getUsername()).orElseThrow(NotFoundUserException::new);
 
+        if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
+            throw new NotMatchUserException();
+        }
+
+        SalesItem salesItem = SalesItem.getInstance(dto);
         salesItem.setUser(user);
         itemRepository.save(salesItem);
     }
@@ -60,6 +68,8 @@ public class SalesItemService {
 
     // 등록 물품 정보 수정
     public void updateItemInfo(Long itemId, RequestItemDto dto) {
+        checkTokenInfo(dto.getUsername());
+
         SalesItem salesItem = itemRepository.findById(itemId).orElseThrow(NotFoundItemException::new);
 
         checkAuthority(salesItem, dto.getUsername(), dto.getPassword());
@@ -69,6 +79,8 @@ public class SalesItemService {
 
     // 등록 물품 이미지 첨부
     public void updateItemImage(Long itemId, MultipartFile itemImage, String username, String password) {
+        checkTokenInfo(username);
+
         SalesItem salesItem = itemRepository.findById(itemId).orElseThrow(NotFoundItemException::new);
         checkAuthority(salesItem, username, password);
 
@@ -99,6 +111,8 @@ public class SalesItemService {
 
     // 등록 물품 삭제
     public void deleteItem(Long itemId, RequestUserDto dto) {
+        checkTokenInfo(dto.getUsername());
+
         SalesItem salesItem = itemRepository.findById(itemId).orElseThrow(NotFoundItemException::new);
 
         checkAuthority(salesItem, dto.getUsername(), dto.getPassword());
@@ -110,6 +124,13 @@ public class SalesItemService {
     // 사용자 인증 메소드
     private void checkAuthority(SalesItem item, String username, String password) {
         if (!item.getUser().getUsername().equals(username) || !passwordEncoder.matches(password, item.getUser().getPassword())) {
+            throw new NotMatchUserException();
+        }
+    }
+
+    private void checkTokenInfo(String username) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (!authentication.getName().equals(username)) {
             throw new NotMatchUserException();
         }
     }
