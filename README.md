@@ -40,25 +40,38 @@ _사용자가 중고 물품을 자유롭게 올리고, 댓글을 통해 소통�
 
 *****
 
-## 📃 주요 기능
+## 📃 기능 명세
+### 사용 방법 (postman 기준)
+- #### `토큰 발급 방법` : 회원가입으로 유저 생성 -> 생성된 유저로 로그인 -> JWT 발급
+- #### `인증이 필요한 기능` : request 창의 Auth 탭 클릭 -> Type : Bearer -> Token : JWT 입력 후 request 진행
+- #### `인증이 필요하지 않은 기능` : 바로 request 진행
+
+### [postman_collection](https://documenter.getpostman.com/view/28054688/2s9XxtxFW1)
+  > 자세한 기능 및 에러에 대한 결과는 위의 postman_collection 을 참조
+  > 
+  > 아래 End Point는 성공했을 때의 예시입니다.
 
 - ### 📌 중고 물품 등록
+  > 등록된 물품 단일 조회 및 전체 조회는 JWT 없이 누구나 조회 가능합니다.
+  > 
+  > 그 외의 기능은 인증된 사용자만 이용 가능합니다.
 
   <details>
   <summary>End Point</summary>
   <div>
 
-  ### 물품 등록
+  ### ➡️ 물품 등록
   
   ### `POST /items`
+
   Request Body:
   ```json
   {
-      "title": "물품 등록 1",
-      "description": "물품 등록 1 설명",
-      "minPriceWanted": 500000,
-      "writer": "물품 등록 작성자 1",
-      "password": "12345"
+      "title": "테스트1",
+      "description": "테스트 설명",
+      "minPriceWanted": 1000000,
+      "username": "유저1",
+      "password": "1234"
   }
   ```
   Response Status: 200
@@ -66,11 +79,11 @@ _사용자가 중고 물품을 자유롭게 올리고, 댓글을 통해 소통�
   Response Body:
   ```json
   {
-    "message": "등록이 완료되었습니다."
+      "message": "등록이 완료되었습니다."
   }
   ```
-  
-  ### 등록된 물품 전체 조회
+
+  ### ➡️ 등록된 물품 전체 조회
   
   ### `GET /items?page={page}&limit={limit}`
   
@@ -84,19 +97,22 @@ _사용자가 중고 물품을 자유롭게 올리고, 댓글을 통해 소통�
   {
       "content": [
             {
-              "id": 1,
-              "title": "물품 등록 1",
-              "description": "물품 등록 1 설명",
-              "minPriceWanted": 500000,
-              "status": "판매중"
+                "id": 1,
+                "title": "테스트 제목2",
+                "username": "유저1",
+                "description": "테스트 설명",
+                "minPriceWanted": 1250000,
+                "imageUrl": "/static/1/itemImage_1.jpg",
+                "status": "판매 완료"
           },
             {
               "id": 2,
-              "title": "물품 등록 2",
-              "description": "물품 등록 2 설명",
-              "minPriceWanted": 700000,
-              "imageUrl": "/static/itemImages/2/itemImage.png",
-              "status": "판매완료"
+              "title": "테스트1",
+              "username": "유저1",
+              "description": "테스트 설명",
+              "minPriceWanted": 1000000,
+              "imageUrl": null,
+              "status": "판매중"
           },
           // ...
       ],
@@ -111,7 +127,7 @@ _사용자가 중고 물품을 자유롭게 올리고, 댓글을 통해 소통�
   }
   ```
   
-  ### 등록된 물품 단일 조회
+  ### ➡️ 등록된 물품 단일 조회
   
   ### `GET /items/{itemId}`
   
@@ -123,15 +139,15 @@ _사용자가 중고 물품을 자유롭게 올리고, 댓글을 통해 소통�
   
   ```json
   {
-      "title": "물품 등록 1",
-      "description": "물품 등록 1 설명",
-      "minPriceWanted": 500000,
-      "writer": "물품 등록 작성자 1",
-      "password": "12345"
+      "title": "테스트 제목2",
+      "username": "유저1",
+      "description": "테스트 설명",
+      "minPriceWanted": 1250000,
+      "status": "판매 완료"
   }
   ```
   
-  ### 물품 정보 수정
+  ### ➡️ 물품 정보 수정
   
   ### `PUT /items/{itemId}`
   
@@ -139,11 +155,11 @@ _사용자가 중고 물품을 자유롭게 올리고, 댓글을 통해 소통�
   
   ```json
   {
-      "title": "물품 등록 1",
-      "description": "물품 등록 1 설명",
-      "minPriceWanted": 550000,
-      "writer": "물품 등록 작성자 1",
-      "password": "12345"
+      "title": "테스트 제목",
+      "description": "테스트 설명",
+      "minPriceWanted": 1250000,
+      "username": "유저1",
+      "password": "1234"
   }
   ```
   Response Body:
@@ -153,7 +169,7 @@ _사용자가 중고 물품을 자유롭게 올리고, 댓글을 통해 소통�
   }
   ```
   
-  ### 이미지 등록
+  ### ➡️ 이미지 등록
   
   ### `PUT /items/{itemId}/image`
   
@@ -173,7 +189,7 @@ _사용자가 중고 물품을 자유롭게 올리고, 댓글을 통해 소통�
   }
   ```
   
-  ### 등록 물품 삭제
+  ### ➡️ 등록 물품 삭제
   
   ###  `DELETE /items/{itemId}`
   
@@ -181,8 +197,8 @@ _사용자가 중고 물품을 자유롭게 올리고, 댓글을 통해 소통�
   
   ```json
   {
-      "writer": "물품 등록 작성자 1",
-      "password": "12345"
+      "username": "유저1",
+      "password": "1234"
   }
   ```
   
@@ -197,12 +213,15 @@ _사용자가 중고 물품을 자유롭게 올리고, 댓글을 통해 소통�
   </details>
 
 - ### 📌 댓글 작성
+  > 댓글 조회는 JWT 없이 누구나 조회 가능합니다.
+  >
+  > 그 외의 기능은 인증된 사용자만 이용 가능합니다.
 
   <details>
   <summary>End Point</summary>
   <div>
   
-  ### 댓글 등록
+  ### ➡️ 댓글 등록
   
   ### `POST /items/{itemId}/comments`
   
@@ -210,9 +229,9 @@ _사용자가 중고 물품을 자유롭게 올리고, 댓글을 통해 소통�
   
   ```json
   {
-      "writer": "댓글 등록자 1",
+      "username": "유저3",
       "password": "1234",
-      "content": "댓글 내용"
+      "content": "할인 가능하신가요?"
   }
   ```
   
@@ -226,7 +245,7 @@ _사용자가 중고 물품을 자유롭게 올리고, 댓글을 통해 소통�
   }
   ```
   
-  ### 댓글 조회
+  ### ➡️ 댓글 조회
   
   ### `GET /items/{itemId}/comments`
   
@@ -240,13 +259,15 @@ _사용자가 중고 물품을 자유롭게 올리고, 댓글을 통해 소통�
       "content": [
           {
               "id": 1,
-              "content": "댓글 내용",
-              "reply": null
+              "username": "유저2",
+              "content": "할인 가능하신가요? 1000000 정도면 고려 가능합니다.",
+              "reply": "됩니다."
           },
           {
               "id": 2,
-              "content": "댓글 내용",
-              "reply": "답글 내용"
+              "username": "유저3",
+              "content": "할인 가능하신가요?",
+              "reply": null
           },
           // ...
       ],
@@ -261,7 +282,7 @@ _사용자가 중고 물품을 자유롭게 올리고, 댓글을 통해 소통�
   }
   ```
   
-  ### 댓글 수정
+  ### ➡️ 댓글 수정
   
   ### `PUT /items/{itemId}/comments/{commentId}`
   
@@ -269,9 +290,9 @@ _사용자가 중고 물품을 자유롭게 올리고, 댓글을 통해 소통�
   
     ```json
     {
-        "writer": "댓글 작성자 1",
+        "username": "유저3",
         "password": "1234",
-        "content": "댓글 내용 수정 1"
+        "content": "할인 가능하신가요? 1000000 정도면 고려 가능합니다."
     }
     ```
   
@@ -283,7 +304,7 @@ _사용자가 중고 물품을 자유롭게 올리고, 댓글을 통해 소통�
     }
     ```
   
-  ### 댓글에 답글 등록
+  ### ➡️ 댓글에 답글 등록
   
   ### `PUT /items/{itemId}/comments/{commentId}/reply`
   
@@ -291,9 +312,9 @@ _사용자가 중고 물품을 자유롭게 올리고, 댓글을 통해 소통�
   
   ```json
   {
-      "writer": "물품 등록 작성자 1",
-      "password": "12345",
-      "reply": "답글 1"
+      "username": "유저1",
+      "password": "1234",
+      "reply": "됩니다."
   }
   ```
   
@@ -305,7 +326,7 @@ _사용자가 중고 물품을 자유롭게 올리고, 댓글을 통해 소통�
   }
   ```
   
-  ### 댓글 삭제
+  ### ➡️ 댓글 삭제
   
   ### `DELETE /items/{itemId}/comments/{commentId}`
   
@@ -313,7 +334,7 @@ _사용자가 중고 물품을 자유롭게 올리고, 댓글을 통해 소통�
   
   ```json
   {
-      "writer": "댓글 작성자 1",
+      "username": "유저3",
       "password": "1234"
   }
   ```
@@ -329,12 +350,13 @@ _사용자가 중고 물품을 자유롭게 올리고, 댓글을 통해 소통�
   </details>
 
 - ### 📌 구매 제안 및 거래
+  > 구매 제안과 관련된 기능은 인증을 받은 사용자만 이용 가능합니다.
 
   <details>
   <summary>End Point</summary>
   <div>
   
-  ### 구매 제안 등록
+  ### ➡️ 구매 제안 등록
   
   ### `POST /items/{itemId}/proposal`
   
@@ -342,9 +364,9 @@ _사용자가 중고 물품을 자유롭게 올리고, 댓글을 통해 소통�
   
   ```json
   {
-      "writer": "제안 작성자 1",
-      "password": "123",
-      "suggestedPrice": 400000
+      "username": "유저3",
+      "password": "1234",
+      "suggestedPrice": 1000000
   }
   ```
   
@@ -358,9 +380,9 @@ _사용자가 중고 물품을 자유롭게 올리고, 댓글을 통해 소통�
   }
   ```
   
-  ### 등록된 구매 제안 조회
+  ### ➡️ 등록된 구매 제안 조회
     - ### 물품 등록자 조회
-      ### `GET /items/{itemId}/proposals?writer=물품 등록 작성자 1&password=12345&page=1`
+      ### `GET /items/{itemId}/proposals?username=유저1&password=1234&page=1`
   
       Request Body: 없음
   
@@ -373,11 +395,13 @@ _사용자가 중고 물품을 자유롭게 올리고, 댓글을 통해 소통�
       "content": [
           {
               "id": 1,
+              "username": "유저2",
               "suggestedPrice": 400000,
               "status": "제안"
           },
           {
               "id": 2,
+              "username": "유저3",
               "suggestedPrice": 50000,
               "status": "거절"
           },
@@ -395,7 +419,7 @@ _사용자가 중고 물품을 자유롭게 올리고, 댓글을 통해 소통�
   ```
   
     - ### 제안 등록자 조회
-      ### `GET /items/{itemId}/proposals?writer=jeeho.edu&password=qwerty1234&page=1`
+      ### `GET /items/{itemId}/proposals?username=유저3&password=1234&page=1`
   
       Request Body: 없음
   
@@ -408,7 +432,8 @@ _사용자가 중고 물품을 자유롭게 올리고, 댓글을 통해 소통�
       "content": [
           {
               "id": 1,
-              "suggestedPrice": 400000,
+              "username": "유저3",
+              "suggestedPrice": 1200000,
               "status": "제안"
           }
           // ...
@@ -424,7 +449,7 @@ _사용자가 중고 물품을 자유롭게 올리고, 댓글을 통해 소통�
   }
   ```
   
-  ### 제안 수정 (가격 변경)
+  ### ➡️ 제안 수정 (가격 변경)
   
   ### `PUT /items/{itemId}/proposals/{proposalId}`
   
@@ -432,9 +457,9 @@ _사용자가 중고 물품을 자유롭게 올리고, 댓글을 통해 소통�
   
   ```json
   {
-      "writer": "제안 작성자 1",
-      "password": "123",
-      "suggestedPrice": 500000
+      "username": "유저2",
+      "password": "1234",
+      "suggestedPrice": 1200000
   }
   ```
   
@@ -446,42 +471,17 @@ _사용자가 중고 물품을 자유롭게 올리고, 댓글을 통해 소통�
   }
   ```
   
-  `writer` 와 `password` 가 물품 등록할 때의 값과 일치하지 않을 경우 실패
+  ### ➡️ 제안 수정 (제안 상태 변경)
   
-  ### 제안 삭제
-  
-  ### `DELETE /items/{itemId}/proposals/{proposalId}`
+  ### `PUT /items/{itemId}/proposals/{proposalId}`
   
   Request Body:
   
   ```json
   {
-      "writer": "제안 작성자 1",
-      "password": "123"
-  }
-  ```
-  
-  Response Body:
-  
-  ```json
-  {
-      "message": "제안을 삭제했습니다."
-  }
-  ```
-  
-  `writer` 와 `password` 가 제안 등록할 때의 값과 일치하지 않을 경우 실패
-  
-  ### 제안 수정 (제안 상태 변경)
-  
-  ### `PUT /items/{itemId}/proposals/{proposalId}/progress`
-  
-  Request Body:
-  
-  ```json
-  {
-      "writer": "물품 등록 작성자 1",
-      "password": "12345",
-      "status": "수락" || "거절"
+      "username": "유저1",
+      "password": "1234",
+      "status": "수락" or "거절"
   }
   ```
   
@@ -493,18 +493,16 @@ _사용자가 중고 물품을 자유롭게 올리고, 댓글을 통해 소통�
   }
   ```
   
-  `writer` 와 `password` 가 물품 등록할 때의 값과 일치하지 않을 경우 실패
+  ### ➡️ 거래 확정
   
-  ### 거래 확정
-  
-  ### `PUT /items/{itemId}/proposals/{proposalId}/progress`
+  ### `PUT /items/{itemId}/proposals/{proposalId}`
   
   Request Body:
   
   ```json
   {
-      "writer": "제안 작성자 1",
-      "password": "123",
+      "username": "유저2",
+      "password": "1234",
       "status": "확정"
   }
   ```
@@ -516,23 +514,86 @@ _사용자가 중고 물품을 자유롭게 올리고, 댓글을 통해 소통�
       "message": "구매가 확정되었습니다."
   }
   ```
-  
-  `writer` 와 `password` 가 제안 등록할 때의 값과 일치하지 않을 경우 실패
-  
-  제안의 상태가 **수락**이 아닐 경우 실패
+
+  ### ➡️ 제안 삭제
+
+  ### `DELETE /items/{itemId}/proposals/{proposalId}`
+
+  Request Body:
+
+  ```json
+  {
+      "username": "유저3",
+      "password": "1234"
+  }
+  ```
+
+  Response Body:
+
+  ```json
+  {
+      "message": "제안을 삭제했습니다."
+  }
+  ```
   
   </div>
   </details>
 
 - ### 📌 회원가입 및 로그인
+  > 회원가입 및 로그인의 경우 누구나 사용 가능합니다.
 
   <details>
   <summary>End Point</summary>
   <div>
 
-  ### 회원가입
+  ### ➡️ 회원가입
 
-  ### 로그인 (토큰 발급)
+  ### `POST /users/register`
+
+  Request Body:
+
+  ```json
+  {
+    "username" : "유저1",
+    "password" : "1234",
+    "passwordCheck" : "1234",
+    "name" : "이름1",
+    "phone" : "010-1234-1234",
+    "email" : "유저1@gmail.com"
+  }
+  ```
+
+  Response Body:
+
+  ```json
+  {
+      "message": "회원가입이 완료되었습니다."
+  }
+  ```
+
+  ### ➡️ 로그인 (토큰 발급)
+
+  ### `POST /users/login`
+
+  Request Body:
+
+  ```json
+  {
+    "username" : "유저1",
+    "password" : "1234"
+  }
+  ```
+
+  Response Body:
+
+  ```json
+  {
+      "token": "eyJhbGciOiJIUzUxMiJ9.
+          eyJzdWIiOiLsnKDsoIAxIiwiaWF0IjoxNjkwNzMyODUwLCJleHAiOjE2OTA3MzY0NTB9.
+          DNKXJZohjnNwC_dV8_w5uWZqwBHwTYZTKQrHRS3l4KmRoXOhFIp_GoPYFaYNEV8OCbGlb4
+          QZusOlCIWG9tdVHg"
+  }
+  ```
 
   </div>
   </details>
@@ -568,5 +629,17 @@ _사용자가 중고 물품을 자유롭게 올리고, 댓글을 통해 소통�
 - 회원가입 기능 구현
 - 로그인 기능 구현
   - JWT 인증 로그인
+
+### 📆 2023.07.27
+#### 6️⃣ 각 Entity 연관관계 매핑
+- ORM 기반 매핑
+- 연관관계 매핑에 따른 Service 코드 리팩토링 
+
+### 📆 2023.07.28
+#### 7️⃣ 기능 접근 설정
+- 인증된 사용자 접근 기능
+  - username 및 password 가 포함되면 인증된 사용자만 사용할 수 있다.
+- 인증되지 않은 사용자 접근 기능
+  - 그 외의 URL은 누구든지 열람할 수 있다.
 
 *****
