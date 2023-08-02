@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style type="text/css">
+        h2.no-uline:hover {
+            text-decoration: underline
+        }
+    </style>
+    <meta charset="UTF-8">
+    <title>멋사마켓</title>
+</head>
+<body>
+<h1>판매 물품 리스트</h1>
+<div id="product-list"></div>
+<div id="pagination"></div>
+<a id="product-add" href="/products/new">물품 등록</a>
+<a href="/main">메인으로 돌아가기</a>
+
+<script>
+    const productList = document.getElementById('product-list')
+    const pagination = document.getElementById('pagination')
+
+    let currentPage = 0
+    const pageSize = 5
+
+    async function fetchProducts(page) {
+        try {
+            const response = await fetch(`/items?page=${page}&limit=${pageSize}`)
+
+            if (!response.ok) {
+                const responseBody = await response.json()
+                alert(responseBody.message)
+                window.location.href = '/main'
+                return
+            }
+
+            return await response.json()
+        } catch (error) {
+            alert(error.message)
+        }
+    }
+
+    function displayProducts(products) {
+        productList.innerHTML = ''
+        for (const product of products.content) {
+            const productDiv = document.createElement('div')
+            productDiv.innerHTML = `<p><h2 class="no-uline" onclick="window.open('/products/${product.id}','_self')" style="cursor:pointer">${product.title}</h2></p>
+                                    <p><h5>작성자: ${product.username}</h5></p><hr>`
+            productList.appendChild(productDiv)
+        }
+    }
+
+    function displayPagination(totalPages) {
+        pagination.innerHTML = ''
+        for (let i = 0; i < totalPages; i++) {
+            const pageButton = document.createElement('button')
+            pageButton.innerText = i + 1
+            pageButton.addEventListener('click', () => onPageButtonClick(i))
+            pagination.appendChild(pageButton)
+        }
+    }
+
+    async function onPageButtonClick(page) {
+        currentPage = page
+        const products = await fetchProducts(currentPage)
+        if (products) {
+            displayProducts(products)
+        }
+    }
+
+    async function initializePagination() {
+        const products = await fetchProducts(currentPage)
+        if (products) {
+            const totalPages = products.totalPages
+            displayProducts(products)
+            displayPagination(totalPages)
+        }
+    }
+
+    initializePagination()
+</script>
+<script>
+    async function checkToken() {
+        try {
+            const token = window.localStorage.getItem('token')
+            const response = await fetch('/token/secure', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+
+            if (!response.ok) {
+                const responseBody = await response.json()
+                alert(responseBody.message)
+                window.location.href = '/auth/sign-in'
+            } else {
+                window.location.href = '/products/new'
+            }
+        } catch (error) {
+            console.log(error)
+            alert(error.message)
+        }
+    }
+
+    document.getElementById('product-add').addEventListener('click', async (event) => {
+        event.preventDefault()
+        await checkToken()
+    })
+</script>
+</body>
+</html>

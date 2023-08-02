@@ -17,10 +17,4 @@ public class RequestItemDto {
     private Integer minPriceWanted;
 
     private String status;
-
-    @NotBlank
-    private String username;
-
-    @NotBlank
-    private String password;
 }

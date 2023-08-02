@@ -11,6 +11,8 @@ public class ResponseItemDto {
 
     private String description;
 
+    private String imageUrl;
+
     private Integer minPriceWanted;
 
     private String status;
@@ -20,6 +22,7 @@ public class ResponseItemDto {
         dto.setTitle(salesItem.getTitle());
         dto.setUsername(salesItem.getUser().getUsername());
         dto.setDescription(salesItem.getDescription());
+        dto.setImageUrl(salesItem.getImageUrl());
         dto.setMinPriceWanted(salesItem.getMinPriceWanted());
         dto.setStatus(salesItem.getStatus());
         return dto;

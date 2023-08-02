@@ -31,51 +31,29 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if (request.getMethod().equals("GET") && isSkipUrl(request.getRequestURI())) {
+        String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
-
-        if (authorization == null || !authorization.startsWith("Bearer ")) {
-            log.warn("jwt validation failed");
+        String token = authHeader.split(" ")[1];
+        if (!jwtTokenUtils.validate(token)) {
             throw new JwtAuthenticationException();
         }
 
-        String token = authorization.split(" ")[1];
-        log.info("token: {}", token);
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        String username = jwtTokenUtils.parseClaims(token).getSubject();
 
-        if (jwtTokenUtils.validate(token)) {
-            SecurityContext context = SecurityContextHolder.createEmptyContext();
+        UserDetails userDetails = userDetailsManager.loadUserByUsername(username);
 
-            String username = jwtTokenUtils.parseClaims(token).getSubject();
+        AbstractAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                userDetails, token, new ArrayList<>()
+        );
 
-            UserDetails userDetails = userDetailsManager.loadUserByUsername(username);
-
-            AbstractAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                    userDetails, token, new ArrayList<>()
-            );
-
-            context.setAuthentication(authenticationToken);
-            SecurityContextHolder.setContext(context);
-            log.info("인증 성공");
-        } else {
-            log.warn("인증 실패");
-            throw new JwtAuthenticationException();
-        }
+        context.setAuthentication(authenticationToken);
+        SecurityContextHolder.setContext(context);
 
         filterChain.doFilter(request, response);
-    }
-
-    private boolean isSkipUrl(String url) {
-        return url.startsWith("/items") && !url.contains("/proposal");
-    }
-
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        String[] excludePath = {"/users/login", "/users/register"};
-        String path = request.getRequestURI();
-        return Arrays.stream(excludePath).anyMatch(path::startsWith);
     }
 }

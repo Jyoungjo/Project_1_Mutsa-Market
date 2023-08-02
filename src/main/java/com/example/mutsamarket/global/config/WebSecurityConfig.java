@@ -24,16 +24,14 @@ public class WebSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/users/login",
-                                "/users/register"
-                        )
-                        .permitAll()
+                        .requestMatchers("/auth/**", "/users/**", "/token/**").permitAll()
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/items",
                                 "/items/{itemId}",
-                                "/items/{itemId}/comments"
+                                "/items/{itemId}/comments",
+                                "/main",
+                                "/products/**"
                         )
                         .permitAll()
                         .anyRequest()

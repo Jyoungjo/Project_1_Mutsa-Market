@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>멋사마켓</title>
+</head>
+<body>
+    <h1>물품 정보 수정</h1>
+    <form id="update-info">
+        <label>
+            제목:
+            <input id="input-title" type="text">
+        </label>
+        <br>
+        <label>
+            설명:
+            <input id="input-desc" type="text">
+        </label>
+        <br>
+        <label>
+            가격:
+            <input id="input-price" type="number">
+        </label>
+        <br>
+        <label>
+            작성자:
+            <input id="input-username" type="text">
+        </label>
+        <br>
+        <label>
+            비밀번호:
+            <input id="input-password" type="password">
+        </label>
+        <br>
+        <input type="submit">
+    </form>
+    <a href="/products/${productId}">이전</a>
+<script>
+    // 이미지 제외 정보 수정
+    document.getElementById('update-info').addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const productInfo = {
+            title: document.getElementById('input-title').value,
+            description: document.getElementById('input-desc').value,
+            minPriceWanted: document.getElementById('input-price').value,
+            username: document.getElementById('input-username').value,
+            password: document.getElementById('input-password').value
+        }
+
+        const productId = [[${productId}]]
+        const token = window.localStorage.getItem('token')
+
+        try {
+            const response = await fetch(`/items/${productId}`, {
+                method: 'PUT',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(productInfo)
+            })
+
+            if (!response.ok) {
+                const responseBody = await response.json()
+                const error = responseBody.message
+                if (error === '다시 로그인하여 주시기 바랍니다.') {
+                    alert(error)
+                    window.location.href = '/auth/sign-in'
+                    return
+                } else {
+                    alert(error)
+                    return
+                }
+            }
+
+            const data = await response.json()
+            alert(data.message)
+            window.location.href = '/products/${productId}'
+
+        } catch (error) {
+            alert(error.message)
+        }
+    })
+</script>
+</body>
+</html>

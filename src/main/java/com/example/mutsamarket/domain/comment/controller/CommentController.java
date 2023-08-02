@@ -2,7 +2,6 @@ package com.example.mutsamarket.domain.comment.controller;
 
 import com.example.mutsamarket.domain.comment.service.CommentService;
 import com.example.mutsamarket.domain.comment.dto.RequestCommentDto;
-import com.example.mutsamarket.domain.comment.dto.RequestCommentUserDto;
 import com.example.mutsamarket.domain.comment.dto.RequestReplyDto;
 import com.example.mutsamarket.domain.comment.dto.ResponseCommentDto;
 import com.example.mutsamarket.global.response.ResponseDto;
@@ -10,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -23,9 +23,11 @@ public class CommentController {
     @PostMapping
     public ResponseEntity<ResponseDto> create(
             @Valid @RequestBody RequestCommentDto dto,
-            @PathVariable("itemId") Long itemId
+            @PathVariable("itemId") Long itemId,
+            Authentication authentication
     ) {
-        commentService.addComment(dto, itemId);
+        String username = authentication.getName();
+        commentService.addComment(dto, itemId, username);
         return ResponseEntity.ok(ResponseDto.getInstance("댓글이 등록되었습니다."));
     }
 
@@ -44,9 +46,11 @@ public class CommentController {
     public ResponseEntity<ResponseDto> update(
             @PathVariable("itemId") Long itemId,
             @PathVariable("commentId") Long commentId,
-            @Valid @RequestBody RequestCommentDto dto
+            @Valid @RequestBody RequestCommentDto dto,
+            Authentication authentication
     ) {
-        commentService.updateComment(commentId, itemId, dto);
+        String username = authentication.getName();
+        commentService.updateComment(commentId, itemId, dto, username);
         return ResponseEntity.ok(ResponseDto.getInstance("댓글이 수정되었습니다."));
     }
 
@@ -55,9 +59,11 @@ public class CommentController {
     public ResponseEntity<ResponseDto> updateReply(
             @PathVariable("itemId") Long itemId,
             @PathVariable("commentId") Long commentId,
-            @Valid @RequestBody RequestReplyDto dto
+            @Valid @RequestBody RequestReplyDto dto,
+            Authentication authentication
     ) {
-        commentService.addReply(itemId, commentId, dto);
+        String username = authentication.getName();
+        commentService.addReply(itemId, commentId, dto, username);
         return ResponseEntity.ok(ResponseDto.getInstance("댓글에 답변이 추가되었습니다."));
     }
 
@@ -66,9 +72,10 @@ public class CommentController {
     public ResponseEntity<ResponseDto> delete(
             @PathVariable("itemId") Long itemId,
             @PathVariable("commentId") Long commentId,
-            @RequestBody RequestCommentUserDto dto
+            Authentication authentication
             ) {
-        commentService.deleteComment(itemId, commentId, dto);
+        String username = authentication.getName();
+        commentService.deleteComment(itemId, commentId, username);
         return ResponseEntity.ok(ResponseDto.getInstance("댓글을 삭제했습니다."));
     }
 }
