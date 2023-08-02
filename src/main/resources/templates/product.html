@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>멋사마켓</title>
+</head>
+<body>
+    <h1>해당 물품 조회 결과</h1><hr>
+    <div id="image-info"></div>
+    <div id="product-info"></div>
+    <h3>댓글 목록</h3>
+    <div>
+        <div id="comment-list"></div><br>
+        <div id="pagination"></div>
+    </div><hr>
+    <h4>댓글 작성</h4>
+    <form id="add-comment">
+        <label>
+            내용:
+            <input id="input-content" type="text">
+        </label>
+        <br>
+        <label>
+            작성자:
+            <input id="input-username" type="text">
+        </label>
+        <br>
+        <label>
+            비밀번호:
+            <input id="input-password" type="password">
+        </label>
+        <br>
+        <input type="submit">
+    </form><hr>
+    <a href="/products">판매 물품 목록</a>
+    <a href="/main">메인으로 돌아가기</a>
+<script>
+    // 물품 조회
+    const productId = [[${productId}]]
+
+    async function fetchItem(productId) {
+        try {
+            const response = await fetch(`/items/${productId}`)
+
+            if (!response.ok) {
+                const responseBody = await response.json()
+                const error = responseBody.message
+                if (error === '등록되지 않은 물품입니다.') {
+                    alert(error)
+                    window.location.href = '/products'
+                    return
+                } else if (error === '다시 로그인하여 주시기 바랍니다.') {
+                    alert(error)
+                    window.location.href = '/auth/sign-in'
+                    return
+                } else {
+                    alert(error)
+                    return
+                }
+            }
+
+            return await response.json()
+        } catch (error) {
+            alert(error.message)
+        }
+    }
+
+    function displayItemDetails(product) {
+        const productInfo = document.getElementById('product-info')
+        productInfo.innerHTML = `
+            <p><h2>[${product.title}]</h2></p>
+            <p><h2>설명: ${product.description}</h2></p>
+            <p><h2>가격: ${product.minPriceWanted}원</h2></p>
+            <p><h2>작성자: ${product.username}</h2></p>
+            <a href="/products/${productId}/update">수정</a>
+            <a href="삭제">삭제</a>
+            <a href="update-product-image">이미지 등록하기</a>
+            <a href="답글">구매 제안 신청</a><hr>
+        `
+    }
+
+    async function initialize() {
+        const product = await fetchItem(productId)
+        if (product) {
+            displayItemDetails(product)
+        }
+    }
+
+    initialize()
+
+</script>
+<script>
+    // 댓글 작성
+    document.getElementById('add-comment').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const comment = {
+            content: document.getElementById('input-content').value,
+            username: document.getElementById('input-username').value,
+            password: document.getElementById('input-password').value
+        }
+
+        const token = window.localStorage.getItem('token')
+        const productId = [[${productId}]]
+
+        try {
+            const response = await fetch(`/items/${productId}/comments`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(comment)
+            })
+
+            if (!response.ok) {
+                const responseBody = await response.json()
+                const error = responseBody.message
+                if (error === '다시 로그인하여 주시기 바랍니다.') {
+                    alert(error)
+                    window.location.href = '/auth/sign-in'
+                    return
+                } else {
+                    alert(error)
+                    return
+                }
+            }
+
+            const data = await response.json()
+            alert(data.message)
+            window.location.reload()
+        } catch (error) {
+            alert(error.message)
+        }
+    })
+</script>
+<script>
+    // 댓글 조회
+    const commentList = document.getElementById('comment-list')
+    const pagination = document.getElementById('pagination')
+
+    let currentPage = 0
+    const pageSize = 3
+
+    async function fetchComments(page) {
+        try {
+            const response = await fetch(`/items/${productId}/comments?page=${page}&limit=${pageSize}`)
+
+            if (!response.ok) {
+                const responseBody = await response.json()
+                alert(responseBody.message)
+                window.location.href = '/products/${productId}'
+                return
+            }
+
+            return await response.json()
+        } catch (error) {
+            alert(error.message)
+        }
+    }
+
+    function displayComments(comments) {
+        commentList.innerHTML = ''
+        for (const comment of comments.content) {
+            const commentDiv = document.createElement('div')
+            commentDiv.innerHTML = `<p><h4>작성자: ${comment.username}</h4></p>
+                                    <p><h4>내용: ${comment.content}</h4></p>
+                                    <a href="수정">수정</a>
+                                    <a href="삭제">삭제</a>
+                                    <a href="답글">답글 달기</a><hr size="1px">`
+            commentList.appendChild(commentDiv)
+        }
+    }
+
+    function displayPagination(totalPages) {
+        pagination.innerHTML = ''
+        for (let i = 0; i < totalPages; i++) {
+            const pageButton = document.createElement('button')
+            pageButton.innerText = i + 1
+            pageButton.addEventListener('click', () => onPageButtonClick(i))
+            pagination.appendChild(pageButton)
+        }
+    }
+
+    async function onPageButtonClick(page) {
+        currentPage = page
+        const comments = await fetchComments(currentPage)
+        if (comments) {
+            displayComments(comments)
+        }
+    }
+
+    async function initializePagination() {
+        const comments = await fetchComments(currentPage)
+        if (comments) {
+            const totalPages = comments.totalPages
+            displayComments(comments)
+            displayPagination(totalPages)
+        }
+    }
+
+    initializePagination()
+</script>
+<script>
+    document.getElementById('image-info').addEventListener('')
+</script>
+</body>
+</html>

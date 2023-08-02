@@ -39,7 +39,6 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
 
         if (authorization == null || !authorization.startsWith("Bearer ")) {
-            log.warn("jwt validation failed");
             throw new JwtAuthenticationException();
         }
 
@@ -69,13 +68,13 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     }
 
     private boolean isSkipUrl(String url) {
-        return url.startsWith("/items") && !url.contains("/proposal");
+        return ((url.startsWith("/items") && !url.contains("/proposal")) || (!url.contains("/products/new") && !url.contains("/update")));
     }
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        String[] excludePath = {"/users/login", "/users/register"};
+        String[] excludePath = {"/users", "/auth", "/main", "/products"};
         String path = request.getRequestURI();
-        return Arrays.stream(excludePath).anyMatch(path::startsWith);
+        return Arrays.stream(excludePath).anyMatch(path::contains);
     }
 }

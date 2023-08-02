@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>멋사마켓</title>
+</head>
+<body>
+    <h1>물품 이미지 수정</h1>
+    <form id="update-info">
+        <form id="update-image">
+            <label>
+                이미지:
+                <input type="file" id="input-image" name="image"><br>
+                <img id="image-preview" src="#" alt="이미지 미리보기" style="max-width: 200px;">
+            </label>
+        </form><br>
+        <label>
+            작성자:
+            <input id="input-username" type="text">
+        </label>
+        <br>
+        <label>
+            비밀번호:
+            <input id="input-password" type="password">
+        </label>
+        <br>
+        <input type="submit">
+    </form>
+<script>
+    // 이미지 제외 정보 수정
+    document.getElementById('update-info').addEventListener('submit', async (event) => {
+        event.preventDefault()
+
+        const imageInput = document.getElementById('input-image')
+        const itemImage = imageInput.files[0]
+
+        const token = window.localStorage.getItem('token');
+
+        try {
+            const response = await fetch(`items/${productId}/image`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    image: itemImage,
+                    username: document.getElementById('input-username').value,
+                    password: document.getElementById('input-password').value
+                })
+            })
+
+            if (!response.ok) {
+                const responseBody = await response.json()
+                const error = responseBody.message
+                if (error === '다시 로그인하여 주시기 바랍니다.') {
+                    alert(error)
+                    window.location.href = '/auth/sign-in'
+                    return
+                } else {
+                    alert(error)
+                }
+            }
+
+            const data = await response.json()
+
+
+        } catch (error) {
+            alert(error.message)
+        }
+    })
+</script>
+</body>
+</html>
