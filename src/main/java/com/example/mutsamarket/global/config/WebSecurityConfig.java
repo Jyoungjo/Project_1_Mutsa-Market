@@ -31,7 +31,8 @@ public class WebSecurityConfig {
                                 "/items/{itemId}",
                                 "/items/{itemId}/comments",
                                 "/main",
-                                "/products/**"
+                                "/products/**",
+                                "/suggestions/**"
                         )
                         .permitAll()
                         .anyRequest()
