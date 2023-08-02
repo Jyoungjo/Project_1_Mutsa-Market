@@ -6,7 +6,6 @@ import com.example.mutsamarket.domain.salesitem.exception.NotFoundItemException;
 import com.example.mutsamarket.domain.user.exception.NotFoundUserException;
 import com.example.mutsamarket.domain.salesitem.domain.SalesItem;
 import com.example.mutsamarket.domain.salesitem.dto.RequestItemDto;
-import com.example.mutsamarket.domain.salesitem.dto.RequestUserDto;
 import com.example.mutsamarket.domain.salesitem.dto.ResponseItemDto;
 import com.example.mutsamarket.domain.salesitem.dto.ResponseItemsDto;
 import com.example.mutsamarket.domain.user.repository.UserRepository;
@@ -18,9 +17,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
@@ -35,17 +31,10 @@ import java.nio.file.Path;
 public class SalesItemService {
     private final SalesItemRepository itemRepository;
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
 
     // 물품 등록
-    public void addItem(RequestItemDto dto) {
-        checkTokenInfo(dto.getUsername());
-
-        UserEntity user = userRepository.findByUsername(dto.getUsername()).orElseThrow(NotFoundUserException::new);
-
-        if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
-            throw new NotMatchUserException();
-        }
+    public void addItem(RequestItemDto dto, String username) {
+        UserEntity user = userRepository.findByUsername(username).orElseThrow(NotFoundUserException::new);
 
         SalesItem salesItem = SalesItem.getInstance(dto);
         salesItem.setUser(user);
@@ -67,22 +56,21 @@ public class SalesItemService {
     }
 
     // 등록 물품 정보 수정
-    public void updateItemInfo(Long itemId, RequestItemDto dto) {
-        checkTokenInfo(dto.getUsername());
-
+    public void updateItemInfo(Long itemId, RequestItemDto dto, String username) {
         SalesItem salesItem = itemRepository.findById(itemId).orElseThrow(NotFoundItemException::new);
+        UserEntity user = userRepository.findByUsername(username).orElseThrow(NotFoundUserException::new);
 
-        checkAuthority(salesItem, dto.getUsername(), dto.getPassword());
+        checkAuthority(salesItem, user);
         salesItem.updateInfo(dto);
         itemRepository.save(salesItem);
     }
 
     // 등록 물품 이미지 첨부
-    public void updateItemImage(Long itemId, MultipartFile itemImage, String username, String password) {
-        checkTokenInfo(username);
-
+    public void updateItemImage(Long itemId, MultipartFile itemImage, String username) {
         SalesItem salesItem = itemRepository.findById(itemId).orElseThrow(NotFoundItemException::new);
-        checkAuthority(salesItem, username, password);
+        UserEntity user = userRepository.findByUsername(username).orElseThrow(NotFoundUserException::new);
+
+        checkAuthority(salesItem, user);
 
         String itemImagesDir = String.format("itemImages/%d/", itemId);
         try {
@@ -110,27 +98,19 @@ public class SalesItemService {
     }
 
     // 등록 물품 삭제
-    public void deleteItem(Long itemId, RequestUserDto dto) {
-        checkTokenInfo(dto.getUsername());
-
+    public void deleteItem(Long itemId, String username) {
         SalesItem salesItem = itemRepository.findById(itemId).orElseThrow(NotFoundItemException::new);
+        UserEntity user = userRepository.findByUsername(username).orElseThrow(NotFoundUserException::new);
 
-        checkAuthority(salesItem, dto.getUsername(), dto.getPassword());
+        checkAuthority(salesItem, user);
+
         salesItem.getUser().deleteSalesItem(salesItem);
-
         itemRepository.deleteById(itemId);
     }
 
     // 사용자 인증 메소드
-    private void checkAuthority(SalesItem item, String username, String password) {
-        if (!item.getUser().getUsername().equals(username) || !passwordEncoder.matches(password, item.getUser().getPassword())) {
-            throw new NotMatchUserException();
-        }
-    }
-
-    private void checkTokenInfo(String username) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (!authentication.getName().equals(username)) {
+    private void checkAuthority(SalesItem item, UserEntity user) {
+        if (!item.getUser().getUsername().equals(user.getUsername())) {
             throw new NotMatchUserException();
         }
     }

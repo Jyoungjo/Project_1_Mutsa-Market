@@ -2,7 +2,6 @@ package com.example.mutsamarket.domain.salesitem.controller;
 
 import com.example.mutsamarket.domain.salesitem.service.SalesItemService;
 import com.example.mutsamarket.domain.salesitem.dto.RequestItemDto;
-import com.example.mutsamarket.domain.salesitem.dto.RequestUserDto;
 import com.example.mutsamarket.domain.salesitem.dto.ResponseItemDto;
 import com.example.mutsamarket.domain.salesitem.dto.ResponseItemsDto;
 import com.example.mutsamarket.global.response.ResponseDto;
@@ -11,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,8 +22,9 @@ public class SalesItemController {
     private final SalesItemService itemService;
 
     @PostMapping
-    public ResponseEntity<ResponseDto> create(@Valid @RequestBody RequestItemDto dto) {
-        itemService.addItem(dto);
+    public ResponseEntity<ResponseDto> create(@Valid @RequestBody RequestItemDto dto, Authentication authentication) {
+        String username = authentication.getName();
+        itemService.addItem(dto, username);
         return ResponseEntity.ok(ResponseDto.getInstance("등록이 완료되었습니다."));
     }
 
@@ -44,9 +45,10 @@ public class SalesItemController {
 
     @PutMapping("/{itemId}")
     public ResponseEntity<ResponseDto> update(
-            @PathVariable("itemId") Long itemId, @Valid @RequestBody RequestItemDto dto
+            @PathVariable("itemId") Long itemId, @Valid @RequestBody RequestItemDto dto, Authentication authentication
     ) {
-        itemService.updateItemInfo(itemId, dto);
+        String username = authentication.getName();
+        itemService.updateItemInfo(itemId, dto, username);
         return ResponseEntity.ok(ResponseDto.getInstance("물품이 수정되었습니다."));
     }
 
@@ -54,18 +56,19 @@ public class SalesItemController {
     public ResponseEntity<ResponseDto> updateImage(
             @PathVariable("itemId") Long itemId,
             @RequestParam("image") MultipartFile itemImage,
-            @RequestParam("username") String username,
-            @RequestParam("password") String password
+            Authentication authentication
     ) {
-        itemService.updateItemImage(itemId, itemImage, username, password);
+        String username = authentication.getName();
+        itemService.updateItemImage(itemId, itemImage, username);
         return ResponseEntity.ok(ResponseDto.getInstance("이미지가 등록되었습니다."));
     }
 
     @DeleteMapping("/{itemId}")
     public ResponseEntity<ResponseDto> delete(
-            @PathVariable("itemId") Long itemId, @RequestBody RequestUserDto dto
+            @PathVariable("itemId") Long itemId, Authentication authentication
     ) {
-        itemService.deleteItem(itemId, dto);
+        String username = authentication.getName();
+        itemService.deleteItem(itemId, username);
         return ResponseEntity.ok(ResponseDto.getInstance("물품을 삭제했습니다."));
     }
 }

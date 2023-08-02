@@ -3,11 +3,9 @@ package com.example.mutsamarket.domain.comment.service;
 import com.example.mutsamarket.domain.comment.repository.CommentRepository;
 import com.example.mutsamarket.domain.comment.domain.Comment;
 import com.example.mutsamarket.domain.comment.dto.RequestCommentDto;
-import com.example.mutsamarket.domain.comment.dto.RequestCommentUserDto;
 import com.example.mutsamarket.domain.comment.dto.RequestReplyDto;
 import com.example.mutsamarket.domain.comment.dto.ResponseCommentDto;
 import com.example.mutsamarket.domain.comment.exception.NotFoundCommentException;
-import com.example.mutsamarket.domain.salesitem.exception.NotMatchItemException;
 import com.example.mutsamarket.domain.user.exception.NotFoundUserException;
 import com.example.mutsamarket.domain.user.exception.NotMatchUserException;
 import com.example.mutsamarket.domain.salesitem.domain.SalesItem;
@@ -21,9 +19,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -33,18 +28,11 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final SalesItemRepository itemRepository;
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
 
     // 댓글 등록
-    public void addComment(RequestCommentDto dto, Long itemId) {
-        checkTokenInfo(dto.getUsername());
-
+    public void addComment(RequestCommentDto dto, Long itemId, String username) {
         SalesItem item = itemRepository.findById(itemId).orElseThrow(NotFoundItemException::new);
-        UserEntity user = userRepository.findByUsername(dto.getUsername()).orElseThrow(NotFoundUserException::new);
-
-        if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
-            throw new NotMatchUserException();
-        }
+        UserEntity user = userRepository.findByUsername(username).orElseThrow(NotFoundUserException::new);
 
         Comment comment = Comment.getInstance(dto);
         comment.setSalesItem(item);
@@ -63,42 +51,36 @@ public class CommentService {
     }
 
     // 댓글 수정
-    public void updateComment(Long commentId, Long itemId, RequestCommentDto dto) {
-        checkTokenInfo(dto.getUsername());
-
+    public void updateComment(Long commentId, Long itemId, RequestCommentDto dto, String username) {
         Comment comment = commentRepository.findById(commentId).orElseThrow(NotFoundCommentException::new);
         SalesItem item = itemRepository.findById(itemId).orElseThrow(NotFoundItemException::new);
+        UserEntity user = userRepository.findByUsername(username).orElseThrow(NotFoundUserException::new);
 
-        checkItem(item, comment);
-        checkAuthority(comment, dto.getUsername(), dto.getPassword());
+        checkAuthority(comment, user);
 
         comment.update(dto);
         commentRepository.save(comment);
     }
 
     // 해당 댓글에 답글 등록
-    public void addReply(Long itemId, Long commentId, RequestReplyDto dto) {
-        checkTokenInfo(dto.getUsername());
-
+    public void addReply(Long itemId, Long commentId, RequestReplyDto dto, String username) {
         Comment comment = commentRepository.findById(commentId).orElseThrow(NotFoundCommentException::new);
         SalesItem item = itemRepository.findById(itemId).orElseThrow(NotFoundItemException::new);
+        UserEntity user = userRepository.findByUsername(username).orElseThrow(NotFoundUserException::new);
 
-        checkItem(item, comment);
-        checkAuthority(item, dto.getUsername(), dto.getPassword());
+        checkAuthority(item, user);
 
         comment.setReply(dto);
         commentRepository.save(comment);
     }
 
     // 댓글 삭제
-    public void deleteComment(Long itemId, Long commentId, RequestCommentUserDto dto) {
-        checkTokenInfo(dto.getUsername());
-
+    public void deleteComment(Long itemId, Long commentId, String username) {
         Comment comment = commentRepository.findById(commentId).orElseThrow(NotFoundCommentException::new);
         SalesItem item = itemRepository.findById(itemId).orElseThrow(NotFoundItemException::new);
+        UserEntity user = userRepository.findByUsername(username).orElseThrow(NotFoundUserException::new);
 
-        checkItem(item, comment);
-        checkAuthority(comment, dto.getUsername(), dto.getPassword());
+        checkAuthority(comment, user);
 
         comment.getSalesItem().deleteComment(comment);
         comment.getUser().deleteComment(comment);
@@ -106,27 +88,14 @@ public class CommentService {
     }
 
     // 사용자 인증 메소드
-    private void checkAuthority(Comment comment, String username, String password) {
-        if (!comment.getUser().getUsername().equals(username) || !passwordEncoder.matches(password, comment.getUser().getPassword())) {
+    private void checkAuthority(Comment comment, UserEntity user) {
+        if (!comment.getUser().getUsername().equals(user.getUsername())) {
             throw new NotMatchUserException();
         }
     }
 
-    private void checkAuthority(SalesItem item, String username, String password) {
-        if (!item.getUser().getUsername().equals(username) || !passwordEncoder.matches(password, item.getUser().getPassword())) {
-            throw new NotMatchUserException();
-        }
-    }
-
-    private void checkItem(SalesItem salesItem, Comment comment) {
-        if (!salesItem.getId().equals(comment.getSalesItem().getId())) {
-            throw new NotMatchItemException();
-        }
-    }
-
-    private void checkTokenInfo(String username) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (!authentication.getName().equals(username)) {
+    private void checkAuthority(SalesItem item, UserEntity user) {
+        if (!item.getUser().getUsername().equals(user.getUsername())) {
             throw new NotMatchUserException();
         }
     }
