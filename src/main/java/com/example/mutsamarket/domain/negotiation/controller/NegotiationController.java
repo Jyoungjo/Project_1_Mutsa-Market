@@ -34,10 +34,11 @@ public class NegotiationController {
     @GetMapping
     public ResponseEntity<Page<ResponseNegotiationDto>> readProposal(
             @PathVariable Long itemId,
-            @RequestParam("username") String username,
             @RequestParam(value = "page", defaultValue = "0") Integer pageNum,
-            @RequestParam(value = "limit", defaultValue = "25") Integer pageSize
+            @RequestParam(value = "limit", defaultValue = "25") Integer pageSize,
+            Authentication authentication
     ) {
+        String username = authentication.getName();
         return ResponseEntity.ok(negotiationService.readProposal(itemId, username, pageNum, pageSize));
     }
 
@@ -50,6 +51,7 @@ public class NegotiationController {
             Authentication authentication
     ) {
         String username = authentication.getName();
+
         // 가격 변경
         if (dto.getStatus() == null) {
             negotiationService.updatePrice(itemId, proposalId, dto, username);

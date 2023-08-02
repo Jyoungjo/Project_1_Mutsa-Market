@@ -61,7 +61,7 @@ public class NegotiationService {
         }
 
         // 2. 제안 등록자
-        negotiationPage = negotiationRepository.findAllBySalesItemIdAndUserId(itemId, user.getId(), pageable);
+        negotiationPage = negotiationRepository.findAllBySalesItemIdAndUserUsername(itemId, user.getUsername(), pageable);
         return negotiationPage.map(ResponseNegotiationDto::fromEntity);
     }
 
