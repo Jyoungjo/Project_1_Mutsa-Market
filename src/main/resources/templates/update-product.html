@@ -7,13 +7,6 @@
 <body>
     <h1>물품 정보 수정</h1>
     <form id="update-info">
-        <form id="update-image">
-            <label>
-                이미지:
-                <input type="file" id="input-image" name="image"><br>
-                <img id="image-preview" src="#" alt="이미지 미리보기" style="max-width: 200px;">
-            </label>
-        </form><br>
         <label>
             제목:
             <input id="input-title" type="text">
@@ -41,6 +34,7 @@
         <br>
         <input type="submit">
     </form>
+    <a href="/products/${productId}">이전</a>
 <script>
     // 이미지 제외 정보 수정
     document.getElementById('update-info').addEventListener('submit', async (event) => {
@@ -54,6 +48,7 @@
             password: document.getElementById('input-password').value
         }
 
+        const productId = [[${productId}]]
         const token = window.localStorage.getItem('token')
 
         try {

@@ -6,7 +6,6 @@
 </head>
 <body>
     <h1>해당 물품 조회 결과</h1><hr>
-    <div id="image-info"></div>
     <div id="product-info"></div>
     <h3>댓글 목록</h3>
     <div>
@@ -67,12 +66,13 @@
 
     function displayItemDetails(product) {
         const productInfo = document.getElementById('product-info')
+
         productInfo.innerHTML = `
             <p><h2>[${product.title}]</h2></p>
             <p><h2>설명: ${product.description}</h2></p>
             <p><h2>가격: ${product.minPriceWanted}원</h2></p>
             <p><h2>작성자: ${product.username}</h2></p>
-            <a href="/products/${productId}/update">수정</a>
+            <a id="move-to-update" href="/products/${productId}/update">수정</a>
             <a href="삭제">삭제</a>
             <a href="update-product-image">이미지 등록하기</a>
             <a href="답글">구매 제안 신청</a><hr>
@@ -199,9 +199,6 @@
     }
 
     initializePagination()
-</script>
-<script>
-    document.getElementById('image-info').addEventListener('')
 </script>
 </body>
 </html>

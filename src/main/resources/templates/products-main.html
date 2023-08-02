@@ -45,7 +45,7 @@
         for (const product of products.content) {
             const productDiv = document.createElement('div')
             productDiv.innerHTML = `<p><h2 class="no-uline" onclick="window.open('/products/${product.id}','_self')" style="cursor:pointer">${product.title}</h2></p>
-                                    <a href="/main/comment">댓글 달기</a><hr>`
+                                    <p><h5>작성자: ${product.username}</h5></p><hr>`
             productList.appendChild(productDiv)
         }
     }
