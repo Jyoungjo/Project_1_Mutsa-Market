@@ -67,7 +67,7 @@ public class NegotiationService {
 
     // 가격 변경
     public void updatePrice(Long itemId, Long proposalId, RequestNegotiationDto dto, String username) {
-        SalesItem item = itemRepository.findById(itemId).orElseThrow(NotFoundItemException::new);
+        checkItem(itemId);
         Negotiation negotiation = negotiationRepository.findById(proposalId).orElseThrow(NotFoundNegotiationException::new);
         UserEntity user = userRepository.findByUsername(username).orElseThrow(NotFoundUserException::new);
 
@@ -121,8 +121,8 @@ public class NegotiationService {
 
     // 구매 제안 삭제
     public void deleteProposal(Long itemId, Long proposalId, String username) {
+        checkItem(itemId);
         Negotiation negotiation = negotiationRepository.findById(proposalId).orElseThrow(NotFoundNegotiationException::new);
-        SalesItem item = itemRepository.findById(itemId).orElseThrow(NotFoundItemException::new);
         UserEntity user = userRepository.findByUsername(username).orElseThrow(NotFoundUserException::new);
 
         checkAuthority(negotiation, user);
@@ -141,6 +141,12 @@ public class NegotiationService {
     private void checkAuthority(SalesItem item, UserEntity user) {
         if (!item.getUser().getUsername().equals(user.getUsername())) {
             throw new NotMatchUserException();
+        }
+    }
+
+    private void checkItem(Long itemId) {
+        if (itemRepository.findById(itemId).isEmpty()) {
+            throw new NotFoundItemException();
         }
     }
 }

@@ -52,8 +52,8 @@ public class CommentService {
 
     // 댓글 수정
     public void updateComment(Long commentId, Long itemId, RequestCommentDto dto, String username) {
+        checkItem(itemId);
         Comment comment = commentRepository.findById(commentId).orElseThrow(NotFoundCommentException::new);
-        SalesItem item = itemRepository.findById(itemId).orElseThrow(NotFoundItemException::new);
         UserEntity user = userRepository.findByUsername(username).orElseThrow(NotFoundUserException::new);
 
         checkAuthority(comment, user);
@@ -76,8 +76,8 @@ public class CommentService {
 
     // 댓글 삭제
     public void deleteComment(Long itemId, Long commentId, String username) {
+        checkItem(itemId);
         Comment comment = commentRepository.findById(commentId).orElseThrow(NotFoundCommentException::new);
-        SalesItem item = itemRepository.findById(itemId).orElseThrow(NotFoundItemException::new);
         UserEntity user = userRepository.findByUsername(username).orElseThrow(NotFoundUserException::new);
 
         checkAuthority(comment, user);
@@ -97,6 +97,12 @@ public class CommentService {
     private void checkAuthority(SalesItem item, UserEntity user) {
         if (!item.getUser().getUsername().equals(user.getUsername())) {
             throw new NotMatchUserException();
+        }
+    }
+
+    private void checkItem(Long itemId) {
+        if (itemRepository.findById(itemId).isEmpty()) {
+            throw new NotFoundItemException();
         }
     }
 }
