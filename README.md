@@ -69,9 +69,7 @@ _사용자가 중고 물품을 자유롭게 올리고, 댓글을 통해 소통�
   {
       "title": "테스트1",
       "description": "테스트 설명",
-      "minPriceWanted": 1000000,
-      "username": "유저1",
-      "password": "1234"
+      "minPriceWanted": 1000000
   }
   ```
   Response Status: 200
@@ -157,9 +155,7 @@ _사용자가 중고 물품을 자유롭게 올리고, 댓글을 통해 소통�
   {
       "title": "테스트 제목",
       "description": "테스트 설명",
-      "minPriceWanted": 1250000,
-      "username": "유저1",
-      "password": "1234"
+      "minPriceWanted": 1250000
   }
   ```
   Response Body:
@@ -177,8 +173,6 @@ _사용자가 중고 물품을 자유롭게 올리고, 댓글을 통해 소통�
   
   ```
   image:    image.(확장자) (file)
-  writer:   물품 등록 작성자 1
-  password: 12345
   ```
   
   Response Body:
@@ -192,16 +186,7 @@ _사용자가 중고 물품을 자유롭게 올리고, 댓글을 통해 소통�
   ### ➡️ 등록 물품 삭제
   
   ###  `DELETE /items/{itemId}`
-  
-  Request Body:
-  
-  ```json
-  {
-      "username": "유저1",
-      "password": "1234"
-  }
-  ```
-  
+
   Response Body:
   ```json
   {
@@ -229,8 +214,6 @@ _사용자가 중고 물품을 자유롭게 올리고, 댓글을 통해 소통�
   
   ```json
   {
-      "username": "유저3",
-      "password": "1234",
       "content": "할인 가능하신가요?"
   }
   ```
@@ -290,8 +273,6 @@ _사용자가 중고 물품을 자유롭게 올리고, 댓글을 통해 소통�
   
     ```json
     {
-        "username": "유저3",
-        "password": "1234",
         "content": "할인 가능하신가요? 1000000 정도면 고려 가능합니다."
     }
     ```
@@ -312,8 +293,6 @@ _사용자가 중고 물품을 자유롭게 올리고, 댓글을 통해 소통�
   
   ```json
   {
-      "username": "유저1",
-      "password": "1234",
       "reply": "됩니다."
   }
   ```
@@ -329,15 +308,6 @@ _사용자가 중고 물품을 자유롭게 올리고, 댓글을 통해 소통�
   ### ➡️ 댓글 삭제
   
   ### `DELETE /items/{itemId}/comments/{commentId}`
-  
-  Request Body:
-  
-  ```json
-  {
-      "username": "유저3",
-      "password": "1234"
-  }
-  ```
   
   Response Body:
   ```json
@@ -364,8 +334,6 @@ _사용자가 중고 물품을 자유롭게 올리고, 댓글을 통해 소통�
   
   ```json
   {
-      "username": "유저3",
-      "password": "1234",
       "suggestedPrice": 1000000
   }
   ```
@@ -457,8 +425,6 @@ _사용자가 중고 물품을 자유롭게 올리고, 댓글을 통해 소통�
   
   ```json
   {
-      "username": "유저2",
-      "password": "1234",
       "suggestedPrice": 1200000
   }
   ```
@@ -479,8 +445,6 @@ _사용자가 중고 물품을 자유롭게 올리고, 댓글을 통해 소통�
   
   ```json
   {
-      "username": "유저1",
-      "password": "1234",
       "status": "수락" or "거절"
   }
   ```
@@ -501,8 +465,6 @@ _사용자가 중고 물품을 자유롭게 올리고, 댓글을 통해 소통�
   
   ```json
   {
-      "username": "유저2",
-      "password": "1234",
       "status": "확정"
   }
   ```
@@ -518,15 +480,6 @@ _사용자가 중고 물품을 자유롭게 올리고, 댓글을 통해 소통�
   ### ➡️ 제안 삭제
 
   ### `DELETE /items/{itemId}/proposals/{proposalId}`
-
-  Request Body:
-
-  ```json
-  {
-      "username": "유저3",
-      "password": "1234"
-  }
-  ```
 
   Response Body:
 
@@ -641,5 +594,9 @@ _사용자가 중고 물품을 자유롭게 올리고, 댓글을 통해 소통�
   - username 및 password 가 포함되면 인증된 사용자만 사용할 수 있다.
 - 인증되지 않은 사용자 접근 기능
   - 그 외의 URL은 누구든지 열람할 수 있다.
+
+### 📆 2023.08.02
+#### 8️⃣ UI 일부 구현
+- 기능들에 대한 UI를 일부 구현했습니다.
 
 *****
