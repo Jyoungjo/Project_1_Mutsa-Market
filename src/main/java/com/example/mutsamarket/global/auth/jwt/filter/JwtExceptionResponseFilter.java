@@ -1,5 +1,6 @@
 package com.example.mutsamarket.global.auth.jwt.filter;
 
+import com.example.mutsamarket.global.auth.jwt.exception.JwtAuthenticationException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -20,7 +21,7 @@ public class JwtExceptionResponseFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
             filterChain.doFilter(request, response);
-        } catch (RuntimeException e) {
+        } catch (JwtAuthenticationException e) {
             sendErrorResponse(response, e.getMessage());
         }
     }
