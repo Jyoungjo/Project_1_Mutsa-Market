@@ -2,10 +2,7 @@ package com.example.mutsamarket.viewcontroller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("/products")
@@ -20,11 +17,6 @@ public class ProductsController {
         return "add-product";
     }
 
-    @PostMapping("/new")
-    public String addItemPost() {
-        return "redirect:/products";
-    }
-
     @GetMapping("/{productId}")
     public String itemPage(@PathVariable Long productId, Model model) {
         model.addAttribute("productId", productId);
@@ -37,9 +29,9 @@ public class ProductsController {
         return "update-product";
     }
 
-    @GetMapping("/{productId}/update/image")
+    @GetMapping("/{productId}/image")
     public String updateImage(@PathVariable Long productId, Model model) {
         model.addAttribute("productId", productId);
-        return "update-product-image";
+        return "update-image";
     }
 }

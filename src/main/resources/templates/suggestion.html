@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>멋사마켓</title>
+</head>
+<body>
+<h1>♻️멋사마켓♻️</h1>
+<h2>구매 제안 조회 목록</h2>
+<div id="suggestion-list"></div>
+<div id="pagination"></div>
+<a id="suggestion-add" href="/suggestions/new/${productId}">제안 등록</a>
+<a href="/main">메인으로 돌아가기</a>
+
+<script>
+    const suggestionList = document.getElementById('suggestion-list')
+    const pagination = document.getElementById('pagination')
+
+    let currentPage = 0
+    const pageSize = 5
+
+    const productId = [[${productId}]]
+    const token = window.localStorage.getItem('token')
+
+    async function fetchSuggestions(page) {
+        try {
+            const response = await fetch(`/items/${productId}/proposal?page=${page}&limit=${pageSize}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+
+            if (!response.ok) {
+                const responseBody = await response.json()
+                const error = responseBody.message
+                if (error === '다시 로그인하여 주시기 바랍니다.') {
+                    alert(error)
+                    window.location.href = '/auth/sign-in'
+                    return
+                } else {
+                    alert(responseBody.message);
+                    window.location.href = '/products'
+                    return
+                }
+            }
+
+            return await response.json()
+        } catch (error) {
+            alert(error.message)
+        }
+    }
+
+    function displaySuggestions(suggestions) {
+        suggestionList.innerHTML = ''
+        for (const suggestion of suggestions.content) {
+            const suggestionDiv = document.createElement('div')
+            const successButtonId = `success_${suggestion.id}`
+            const rejectButtonId = `reject_${suggestion.id}`
+            const confirmButtonId = `confirm_${suggestion.id}`
+            const changePriceButtonId = `changePrice_${suggestion.id}`
+            const deleteButtonId = `delete_${suggestion.id}`
+            suggestionDiv.innerHTML = `<p><h4>${suggestion.username}님이 ${suggestion.suggestedPrice}원을 제안하셨습니다.</h4></p>
+                                       <p><h5>상태: ${suggestion.status}</h5></p>
+                                       <button id="${changePriceButtonId}">가격 변경</button>
+                                       <button id="${successButtonId}">수락</button>
+                                       <button id="${rejectButtonId}">거절</button>
+                                       <button id="${confirmButtonId}">확정</button>
+                                       <button id="${deleteButtonId}">삭제</button><hr>`
+
+            suggestionList.appendChild(suggestionDiv)
+
+            const changePriceButton = document.getElementById(changePriceButtonId)
+            const successButton = document.getElementById(successButtonId)
+            const rejectButton = document.getElementById(rejectButtonId)
+            const confirmButton = document.getElementById(confirmButtonId)
+            const deleteButton = document.getElementById(deleteButtonId)
+
+            successButton.addEventListener('click', () => handleSuccess(suggestion.id))
+            rejectButton.addEventListener('click', () => handleReject(suggestion.id))
+            confirmButton.addEventListener('click', () => handleConfirm(suggestion.id))
+            changePriceButton.addEventListener('click', () => handleChangePrice(suggestion.id))
+            deleteButton.addEventListener('click', () => handleDelete(suggestion.id))
+        }
+    }
+
+    async function handleSuccess(suggestionId) {
+        try {
+            const token = window.localStorage.getItem('token')
+            const productId = [[${productId}]]
+            const response = await fetch(`/items/${productId}/proposal/${suggestionId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    status: '수락'
+                })
+            })
+
+            if (!response.ok) {
+                const responseBody = await response.json()
+                const error = responseBody.message
+                if (error === '다시 로그인하여 주시기 바랍니다.') {
+                    alert(error)
+                    window.location.href = '/auth/sign-in'
+                    return
+                } else {
+                    alert(responseBody.message)
+                    return
+                }
+            }
+            const body = await response.json()
+
+            alert(body.message)
+            window.location.reload()
+        } catch (error) {
+            alert(error.message)
+        }
+    }
+
+    async function handleReject(suggestionId) {
+        try {
+            const token = window.localStorage.getItem('token')
+            const productId = [[${productId}]]
+            const response = await fetch(`/items/${productId}/proposal/${suggestionId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    status: '거절'
+                })
+            })
+
+            if (!response.ok) {
+                const responseBody = await response.json()
+                const error = responseBody.message
+                if (error === '다시 로그인하여 주시기 바랍니다.') {
+                    alert(error)
+                    window.location.href = '/auth/sign-in'
+                    return
+                } else {
+                    alert(responseBody.message)
+                    return
+                }
+            }
+            const body = await response.json()
+
+            alert(body.message)
+            window.location.reload()
+        } catch (error) {
+            alert(error.message)
+        }
+    }
+
+    async function handleConfirm(suggestionId) {
+        try {
+            const token = window.localStorage.getItem('token')
+            const productId = [[${productId}]]
+            const response = await fetch(`/items/${productId}/proposal/${suggestionId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    status: '확정'
+                })
+            })
+
+            if (!response.ok) {
+                const responseBody = await response.json()
+                const error = responseBody.message
+                if (error === '다시 로그인하여 주시기 바랍니다.') {
+                    alert(error)
+                    window.location.href = '/auth/sign-in'
+                    return
+                } else {
+                    alert(responseBody.message)
+                    return
+                }
+            }
+            const body = await response.json()
+
+            alert(body.message)
+            window.location.reload()
+        } catch (error) {
+            alert(error.message)
+        }
+    }
+
+    function handleChangePrice(suggestionId) {
+        const newPrice = prompt('새로운 가격을 입력하세요: ')
+        if (newPrice !== null) {
+            const parsedPrice = parseInt(newPrice)
+            if (!isNaN(parsedPrice)) {
+                updateSuggestionPrice(suggestionId, parsedPrice)
+            } else {
+                alert('유효한 숫자를 입력해주세요.')
+                handleChangePrice(suggestionId)
+            }
+        }
+    }
+
+    async function updateSuggestionPrice(suggestionId, newPrice) {
+        try {
+            const token = window.localStorage.getItem('token')
+            const productId = [[${productId}]]
+            const response = await fetch(`/items/${productId}/proposal/${suggestionId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    suggestedPrice: newPrice
+                })
+            })
+
+            if (!response.ok) {
+                const responseBody = await response.json()
+                const error = responseBody.message
+                if (error === '다시 로그인하여 주시기 바랍니다.') {
+                    alert(error)
+                    window.location.href = '/auth/sign-in'
+                    return
+                } else {
+                    alert(responseBody.message)
+                    return
+                }
+            }
+
+            const body = await response.json()
+
+            console.log(body.message)
+            alert(body.message)
+            window.location.reload()
+        } catch (error) {
+            alert(error.message)
+        }
+    }
+
+    async function handleDelete(suggestionId) {
+        try {
+            const token = window.localStorage.getItem('token')
+            const productId = [[${productId}]]
+            const response = await fetch(`/items/${productId}/proposal/${suggestionId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+
+            const checkDelete = window.confirm('삭제하시겠습니까?')
+            if (!checkDelete) {
+                return
+            }
+
+            if (!response.ok) {
+                const responseBody = await response.json()
+                const error = responseBody.message
+                if (error === '다시 로그인하여 주시기 바랍니다.') {
+                    alert(error)
+                    window.location.href = '/auth/sign-in'
+                    return
+                } else {
+                    alert(responseBody.message)
+                    return
+                }
+            }
+
+            const body = await response.json()
+
+            alert(body.message)
+            window.location.reload()
+        } catch (error) {
+            alert(error.message)
+        }
+    }
+
+    function displayPagination(totalPages) {
+        pagination.innerHTML = ''
+        for (let i = 0; i < totalPages; i++) {
+            const pageButton = document.createElement('button')
+            pageButton.innerText = i + 1
+            pageButton.addEventListener('click', () => onPageButtonClick(i))
+            pagination.appendChild(pageButton)
+        }
+    }
+
+    async function onPageButtonClick(page) {
+        currentPage = page
+        const suggestions = await fetchSuggestions(currentPage)
+        if (suggestions) {
+            displaySuggestions(suggestions)
+        }
+    }
+
+    async function initializePagination() {
+        const suggestions = await fetchSuggestions(currentPage)
+        if (suggestions) {
+            const totalPages = suggestions.totalPages
+            displaySuggestions(suggestions)
+            displayPagination(totalPages)
+        }
+    }
+
+    initializePagination()
+</script>
+<script>
+    async function checkToken() {
+        try {
+            const token = window.localStorage.getItem('token')
+            const response = await fetch('/token/secure', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+
+            if (!response.ok) {
+                const responseBody = await response.json()
+                alert(responseBody.message)
+                window.location.href = '/auth/sign-in'
+            } else {
+                window.location.href = `/suggestions/new/${productId}`
+            }
+        } catch (error) {
+            console.log(error)
+            alert(error.message)
+        }
+    }
+
+    document.getElementById('suggestion-add').addEventListener('click', async (event) => {
+        event.preventDefault()
+        await checkToken()
+    })
+</script>
+</body>
+</html>

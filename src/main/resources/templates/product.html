@@ -5,7 +5,8 @@
     <title>멋사마켓</title>
 </head>
 <body>
-    <h1>해당 물품 조회 결과</h1><hr>
+<h1>♻️멋사마켓♻️</h1>
+    <h2>해당 물품 조회 결과</h2><hr>
     <div id="product-info"></div>
     <h3>댓글 목록</h3>
     <div>
@@ -17,16 +18,6 @@
         <label>
             내용:
             <input id="input-content" type="text">
-        </label>
-        <br>
-        <label>
-            작성자:
-            <input id="input-username" type="text">
-        </label>
-        <br>
-        <label>
-            비밀번호:
-            <input id="input-password" type="password">
         </label>
         <br>
         <input type="submit">
@@ -46,7 +37,7 @@
                 const error = responseBody.message
                 if (error === '등록되지 않은 물품입니다.') {
                     alert(error)
-                    window.location.href = '/products'
+                    window.location.reload()
                     return
                 } else if (error === '다시 로그인하여 주시기 바랍니다.') {
                     alert(error)
@@ -69,14 +60,49 @@
 
         productInfo.innerHTML = `
             <p><h2>[${product.title}]</h2></p>
+            <div id="image-container" style="display: block">
+                <img id="product-image" th:src="itemImages/itemImage_6.jpg" alt="물품 이미지" style="max-width: 300px"/>
+            </div>
             <p><h2>설명: ${product.description}</h2></p>
             <p><h2>가격: ${product.minPriceWanted}원</h2></p>
             <p><h2>작성자: ${product.username}</h2></p>
-            <a id="move-to-update" href="/products/${productId}/update">수정</a>
-            <a href="삭제">삭제</a>
-            <a href="update-product-image">이미지 등록하기</a>
-            <a href="답글">구매 제안 신청</a><hr>
+            <a href="/products/${productId}/update">수정</a>
+            <a id="delete" href="/products">삭제</a>
+            <a href="/products/${productId}/image">이미지 등록하기</a>
+            <a href="/suggestions/new">구매 신청</a>
+            <a href="/suggestions/${productId}">제안 조회</a><hr>
         `
+
+        document.getElementById('delete').addEventListener('click', async (event) => {
+            event.preventDefault()
+            try {
+                const token = window.localStorage.getItem('token')
+
+                const response = await fetch(`/items/${productId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                })
+
+                if (!response.ok) {
+                    const responseBody = await response.json()
+                    const error = responseBody.message
+                    if (error === '다시 로그인하여 주시기 바랍니다.') {
+                        alert(error)
+                        window.location.href = '/auth/sign-in'
+                        return
+                    }
+                    alert(responseBody.message)
+                }
+
+                const data = await response.json()
+                alert(data.message)
+                window.location.href = '/products'
+            } catch (error) {
+                alert(error.message)
+            }
+        })
     }
 
     async function initialize() {
@@ -94,9 +120,7 @@
     document.getElementById('add-comment').addEventListener('submit', async (event) => {
         event.preventDefault();
         const comment = {
-            content: document.getElementById('input-content').value,
-            username: document.getElementById('input-username').value,
-            password: document.getElementById('input-password').value
+            content: document.getElementById('input-content').value
         }
 
         const token = window.localStorage.getItem('token')

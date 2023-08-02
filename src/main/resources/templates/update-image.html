@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>멋사마켓</title>
+</head>
+<body>
+<h1>♻️멋사마켓♻️</h1>
+    <h2>물품 이미지 등록</h2>
+    <form id="update-image" enctype="multipart/form-data">
+        <label>
+            이미지:
+            <input type="file" id="input-image" accept="image/*" name="image" onchange="previewImage(event)"><br>
+        </label><br>
+        <img id="image-preview" src="#" alt="미리보기" style="max-width: 200px"><br>
+        <input type="submit"><br>
+    </form><br>
+    <a href="javascript:history.back()">이전</a>
+    <a href="/products">물품 목록</a>
+    <a href="/main">메인 페이지</a>
+<script>
+    function previewImage(ev) {
+        const preview = document.getElementById('image-preview')
+        preview.src = URL.createObjectURL(ev.target.files[0])
+    }
+</script>
+<script>
+    document.getElementById('update-image').addEventListener('submit', async (event) => {
+        event.preventDefault()
+
+        const token = window.localStorage.getItem('token')
+        const productId = [[${productId}]]
+
+        const formData = new FormData()
+        const productImage = document.getElementById('input-image').files[0]
+        formData.append('image', productImage)
+
+        try {
+            const response = await fetch(`/items/${productId}/image`, {
+                method: 'PUT',
+                headers: {
+                    Authorization: `Bearer ${token}`
+                },
+                body: formData
+            })
+
+            if (!response.ok) {
+                const responseBody = await response.json()
+                const error = responseBody.message
+                if (error === '다시 로그인하여 주시기 바랍니다.') {
+                    alert(error)
+                    window.location.href = '/auth/sign-in'
+                } else {
+                    alert(error)
+                    return
+                }
+            }
+
+            const data = await response.json()
+            alert(data.message)
+            window.location.href = `/products/${productId}`
+        } catch (error) {
+            alert(error.message)
+        }
+    })
+</script>
+</body>
+</html>
